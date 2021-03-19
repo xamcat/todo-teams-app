@@ -1,0 +1,187 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Validate Teams App launch URL",
+            "command": "node ./.vscode/validateBeforeLaunch.js azure",
+            "problemMatcher": {
+                "owner": "node",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/.vscode"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "type": "shell",
+            "label": "Validate local debug Teams App launch URL",
+            "command": "node ./.vscode/validateBeforeLaunch.js local",
+            "problemMatcher": {
+                "owner": "node",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/.vscode"
+                ],
+                "pattern": {
+                    "regexp": "^(.*):(\\d+):(\\d+):\\s+(error):\\s+(.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "column": 3,
+                    "severity": 4,
+                    "message": 5
+                }
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "type": "npm",
+            "script": "install",
+            "path": "tabs/",
+            "group": "test",
+            "problemMatcher": [],
+            "label": "npm: install - tabs",
+            "detail": "npm install packages"
+        },
+        {
+            "type": "npm",
+            "script": "start",
+            "isBackground": true,
+            "label": "npm: start - tabs",
+            "presentation": {
+                "focus": true,
+                "panel": "dedicated"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/tabs",
+                "env": {
+                    "REACT_APP_MODS_ENDPOINT": "${config:ms-mods-vscode-extension.localdebug.authServerEndpoint}",
+                    "REACT_APP_START_LOGIN_PAGE_URL": "auth-start.html",
+                    "REACT_APP_FUNC_ENDPOINT": "${config:ms-mods-vscode-extension.localdebug.functionEndpoint}"
+                }
+            },
+            "problemMatcher": {
+                "owner": "typescript",
+                "source": "ts",
+                "applyTo": "closedDocuments",
+                "fileLocation": [
+                    "relative",
+                    "${cwd}"
+                ],
+                "pattern": "$tsc",
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": {
+                        "regexp": "(.*?)"
+                    },
+                    "endsPattern": {
+                        "regexp": "Compiled |Failed to compile."
+                    }
+                }
+            }
+        },
+        {
+            "type": "shell",
+            "label": "start auth server",
+            "command": "dotnet Microsoft.TeamsRuntimeConnector.dll",
+            "options": {
+                "cwd": "${config:ms-mods-vscode-extension.localdebug.authServerPath}",
+                "env": {
+                    "CLIENT_ID": "${config:ms-mods-vscode-extension.localdebug.clientId}",
+                    "CLIENT_SECRET": "${config:ms-mods-vscode-extension.localdebug.clientSecret}",
+                    "IDENTIFIER_URI": "api://localhost/${config:ms-mods-vscode-extension.localdebug.clientId}",
+                    "OAUTH_TOKEN_ENDPOINT": "https://login.microsoftonline.com/${config:ms-mods-vscode-extension.localdebug.tenantId}/oauth2/v2.0/token",
+                    "ALLOWED_APP_IDS": "${config:ms-mods-vscode-extension.localdebug.allowedAppIds}",
+                    "urls": "${config:ms-mods-vscode-extension.localdebug.authServerEndpoint}"
+                }
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "focus": true,
+                "panel": "dedicated"
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "fileLocation": [
+                    "relative",
+                    "${cwd}"
+                ],
+                "pattern": {
+                    "regexp": ".",
+                    "file": 1,
+                    "location": 2,
+                    "message": 3
+                },
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "."
+                }
+            }
+        },
+        {
+            "label": "Start tab app and auth server",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Validate local debug Teams App launch URL",
+                "npm: install - tabs",
+                "npm: start - tabs",
+                "start auth server"
+            ]
+        },
+        {
+            "label": "Terminate auth server",
+            "command": "echo ${input:terminateAuth}",
+            "type": "shell",
+            "problemMatcher": []
+        },
+        {
+            "label": "Terminate tab app",
+            "command": "echo ${input:terminateTab}",
+            "type": "shell",
+            "problemMatcher": [] 
+        },
+        {
+            "label": "Terminate tab app and auth server",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "Terminate auth server",
+                "Terminate tab app"
+            ]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "terminateAuth",
+            "type": "command",
+            "command": "workbench.action.tasks.terminate",
+            "args": "start auth server"
+        },
+        {
+            "id":"terminateTab",
+            "type":"command",
+            "command": "workbench.action.tasks.terminate",
+            "args": "npm: start - tabs"
+        }
+    ]
+}

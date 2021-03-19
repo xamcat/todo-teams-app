@@ -1,0 +1,25 @@
+{
+    "version": "1.0.0",
+    "frontendHosting": "Azure",
+    "backendResource": [
+        "azure-functions",
+        "sql"
+    ],
+    "appName": "todo-teams-app",
+    "baseUrl": "",
+    "azure": {
+        "tabAppBuildOutput": "/tabs/build",
+        "functionAppSolutionPath": "api",
+        "authServiceEndpoint": "",
+        "teamsAppAadId": "",
+        "frontendDomain": "",
+        "frontendStorageName": "",
+        "backendFunctionName": "",
+        "resourceGroupName": "",
+        "subscriptionId": "",
+        "sqlDefaultTable": true,
+        "sqlDatabaseName": "",
+        "sqlServerEndpoint": "",
+        "userAssignedIdentityId": ""
+    }
+}

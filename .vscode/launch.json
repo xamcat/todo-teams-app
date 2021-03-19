@@ -1,0 +1,34 @@
+{
+    "version": "1.0.0",
+    "configurations": [
+        {
+            "name": "Local Debug Tab App (Teams Web Client)",
+            "type": "pwa-msedge",
+            "request": "launch",
+            "url": "https://teams.microsoft.com/_#/l/app/d3fcbad3-e8d3-4f47-aae4-2b99966bcc57?installAppPackage=true",
+            "webRoot": "${workspaceFolder}",
+            "preLaunchTask": "Start tab app and auth server",
+            "postDebugTask": "Terminate tab app and auth server"
+        },
+        {
+            "name": "Debug (Teams Web Client)",
+            "type": "pwa-msedge",
+            "request": "launch",
+            "url": "https://teams.microsoft.com/_#/l/app/{teamsAppId}?installAppPackage=true",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "name": "Debug (Edge)",
+            "type": "pwa-msedge",
+            "request": "launch",
+            "url": "https://localhost:3000/index.html#/tab",
+            "webRoot": "${workspaceFolder}"
+        },
+        {
+            "name": "Local Debug Function",
+            "type": "node",
+            "request": "attach",
+            "port": 5858
+        }
+    ]
+}
