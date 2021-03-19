@@ -14,3 +14,8 @@
 - Reminder (send a message to myself 1 hour before the TODO item time
 - [Nice to have] Offline Storage
 - [Nice to have] Ability to group list by category
+
+## Development
+
+- [Server-side](api/README.md)
+- [Client-side](tabs/README.md)
