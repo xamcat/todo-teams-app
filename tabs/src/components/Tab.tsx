@@ -11,7 +11,7 @@ import { Button } from '@fluentui/react-northstar'
  * of your app.
  */
 class Tab extends React.Component {
-  constructor(props) {
+  constructor(props: any) {
     super(props)
     this.state = {
       userInfo: {},
@@ -38,7 +38,7 @@ class Tab extends React.Component {
     var modsEndpoint = process.env.REACT_APP_MODS_ENDPOINT;
     var startLoginPageUrl = process.env.REACT_APP_START_LOGIN_PAGE_URL;
     var functionEndpoint = process.env.REACT_APP_FUNC_ENDPOINT;
-    await MODS.init(modsEndpoint, startLoginPageUrl, functionEndpoint);
+    await MODS.init(modsEndpoint!, startLoginPageUrl!, functionEndpoint);
     var userInfo = MODS.getUserInfo();
     this.setState({
       userInfo: userInfo
@@ -122,7 +122,7 @@ class Tab extends React.Component {
   render() {
     return (
       <div>
-        <h2>TODO App</h2>
+        <h2>TODO App (TypeScript)</h2>
         <p><b>Name:</b> {this.state.userInfo.userName}</p>
         <p><b>E-mail:</b> {this.state.userInfo.preferredUserName}</p>
 

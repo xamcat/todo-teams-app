@@ -6,13 +6,15 @@
   },
   "private": true,
   "dependencies": {
-    "@microsoft/teams-js": "^1.6.0",
     "@fluentui/react-northstar": "^0.51.0",
+    "@microsoft/teams-js": "^1.6.0",
+    "@types/react": "^17.0.3",
+    "mods-client": "github:OfficeDev/mods-client-sdk-private-preview",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-router-dom": "^5.1.2",
     "react-scripts": "^3.4.3",
-    "mods-client": "github:OfficeDev/mods-client-sdk-private-preview"
+    "typescript": "^4.2.3"
   },
   "scripts": {
     "start": "react-scripts start",
