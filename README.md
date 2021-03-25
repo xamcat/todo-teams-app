@@ -19,3 +19,9 @@
 
 - [Server-side](api/README.md)
 - [Client-side](tabs/README.md)
+
+## Figma Design
+
+The Figma design can be found [here](https://www.figma.com/file/UHHwGcx8YG30LO6fp5gY21/TODO-App) and quick prototype is below
+
+![Figma Prototype](todo-figma-prototype.png)
