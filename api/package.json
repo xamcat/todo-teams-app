@@ -1,13 +1,16 @@
 {
-  "name": "function-component",
-  "version": "1.0.0",
-  "description": "",
-  "scripts": {
-    "start": "node ./scripts/start.js func start",
-    "test": "echo \"No tests yet...\""
-  },
-  "dependencies": {
-    "mods-server": "github:OfficeDev/mods-server-sdk-private-preview"
-  },
-  "devDependencies": {}
+    "name": "function-component",
+    "version": "1.0.0",
+    "description": "",
+    "scripts": {
+        "start": "node ./scripts/start.js func start",
+        "test": "echo \"No tests yet...\""
+    },
+    "dependencies": {
+        "mods-server": "github:OfficeDev/mods-server-sdk-private-preview"
+    },
+    "devDependencies": {},
+    "msteams": {
+        "teamsAppId": "537e8a34-8656-425c-8b65-2eed21dcc505"
+    }
 }

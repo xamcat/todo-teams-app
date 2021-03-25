@@ -2,24 +2,23 @@
     "version": "1.0.0",
     "frontendHosting": "Azure",
     "backendResource": [
-        "azure-functions",
-        "sql"
+        "azure-functions"
     ],
     "appName": "todo-teams-app",
-    "baseUrl": "",
+    "baseUrl": "https://todoteamsappfeb2e191.azureedge.net",
     "azure": {
         "tabAppBuildOutput": "/tabs/build",
         "functionAppSolutionPath": "api",
-        "authServiceEndpoint": "",
-        "teamsAppAadId": "",
-        "frontendDomain": "",
-        "frontendStorageName": "",
-        "backendFunctionName": "",
+        "authServiceEndpoint": "https://todoteamsapp-runtime-b2e191.azurewebsites.net",
+        "teamsAppAadId": "7f804d38-a426-4134-b91e-1448cb3d5259",
+        "frontendDomain": "todoteamsappfeb2e191.azureedge.net",
+        "frontendStorageName": "todoteamsappfeb2e191",
+        "backendFunctionName": "todoteamsapp-be-b2e191",
         "resourceGroupName": "todo_teams_app",
         "subscriptionId": "498092e0-4b48-4b45-9033-16348a07ef12",
-        "sqlDefaultTable": true,
-        "sqlDatabaseName": "",
-        "sqlServerEndpoint": "",
-        "userAssignedIdentityId": ""
-    }
+        "userAssignedIdentityId": "",
+        "backendFunctionUrl": "https://todoteamsapp-be-b2e191.azurewebsites.net"
+    },
+    "appClientId": "7dea05e8-1fdf-44fe-8a90-140693e650f7",
+    "appid": "7dea05e8-1fdf-44fe-8a90-140693e650f7"
 }

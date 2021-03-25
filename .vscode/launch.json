@@ -14,7 +14,7 @@
             "name": "Debug (Teams Web Client)",
             "type": "pwa-msedge",
             "request": "launch",
-            "url": "https://teams.microsoft.com/_#/l/app/{teamsAppId}?installAppPackage=true",
+            "url": "https://teams.microsoft.com/_#/l/app/537e8a34-8656-425c-8b65-2eed21dcc505?installAppPackage=true",
             "webRoot": "${workspaceFolder}"
         },
         {
