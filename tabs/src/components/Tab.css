@@ -19,4 +19,6 @@
 
 .ToDoListItem {
   color: white;
+  font-size: large;
+  list-style-type: none;
 }

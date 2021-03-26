@@ -5,6 +5,7 @@ import React from 'react';
 import './App.css';
 import './Tab.css';
 import { MODS } from "mods-client";
+import { Checkbox } from '@fluentui/react-northstar';
 
 /**
  * The 'PersonalTab' component renders the main tab content
@@ -53,7 +54,7 @@ class Tab extends React.Component {
         <div className="ToDoList">
           {data.map(function(d, index){
             return (
-              <li className="ToDoListItem" key={index}>{d.name}</li>
+              <li className="ToDoListItem" key={index}><Checkbox />{d.name}</li>
             )
           })}
       </div>
