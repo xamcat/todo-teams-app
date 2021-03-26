@@ -3,26 +3,19 @@
 
 import React from 'react';
 import './App.css';
+import './Tab.css';
 import { MODS } from "mods-client";
-import { Button } from '@fluentui/react-northstar'
 
 /**
  * The 'PersonalTab' component renders the main tab content
  * of your app.
  */
 class Tab extends React.Component {
+
   constructor(props: any) {
     super(props)
     this.state = {
       userInfo: {},
-      profile: {},
-      photoObjectURL: "",
-      fetchPhotoErrorMessage: "",
-      showLoginBtn: false,
-      showGraphMessage: false,
-      functionMessage: "",
-      functionErrorMessage: "",
-      showFunctionMessage: false
     }
   }
 
@@ -31,7 +24,6 @@ class Tab extends React.Component {
   async componentDidMount() {
     // Next steps: Error handling using the error object
     await this.initMODS();
-    await this.callGraphSilent();
   }
 
   async initMODS() {
@@ -45,120 +37,29 @@ class Tab extends React.Component {
     });
   }
 
-  async callGraphSilent() {
-    try {
-      var graphClient = await MODS.getMicrosoftGraphClient();
-      var profile = await graphClient.api("/me").get();
-
-      var message = "";
-      var funcErrorMsg = "";
-      var showFunctionMessage = false;
-
-      try {
-        var functionName = process.env.REACT_APP_FUNC_NAME || "httpTrigger";
-        var messageJson = await MODS.callFunction(functionName, "post", "hello");
-        message = JSON.stringify(messageJson, undefined, 2);
-      } catch (err) {
-        if (err.response && err.response.status && err.response.status === 404) {
-          funcErrorMsg = "There may be a problem with the deployment of Azure Function App, please deploy Azure Function (Run command palette 'MODS - Deploy All (frontend and backend)') first before running this App";
-        } else if (err.message === "Network Error") {
-          funcErrorMsg = "Cannot call Azure Function due to network error, please check your network connection status and ";
-          if (err.config.url.indexOf("localhost") >= 0) {
-            funcErrorMsg += "make sure to start Azure Function locally (Run 'npm run start' command inside api folder from terminal) first before running this App";
-          }
-          else {
-            funcErrorMsg += "make sure to provision and deploy Azure Function (Run command palette 'MODS - Create environment -> Azure' and 'MODS - Deploy All (frontend and backend)') first before running this App";
-          }
-        } else {
-          funcErrorMsg = err.toString();
-          if (err.response?.data?.error) {
-            funcErrorMsg += ": " + err.response.data.error;
-          }
-        }
-      }
-      showFunctionMessage = true;
-
-      this.setState({
-        profile: profile,
-        showGraphMessage: true,
-        showFunctionMessage: showFunctionMessage,
-        functionMessage: message,
-        functionErrorMessage: funcErrorMsg
-      })
-
-      try {
-        var photoBlob = await graphClient.api("/me/photo/$value").get();
-        this.setState({
-          photoObjectURL: URL.createObjectURL(photoBlob),
-        });
-      } catch (error) {
-        this.setState({
-          fetchPhotoErrorMessage: "Could not fetch photo from your profile, you need to add photo in the profile settings first: " + error.message
-        });
-      }
-    }
-    catch (err) {
-      this.setState({
-        showLoginBtn: true,
-        showGraphMessage: false
-      });
-    }
-  }
-
-  async loginBtnClick() {
-    try {
-      await MODS.popupLoginPage();
-    }
-    catch (err) {
-      alert("Login failed: " + err);
-      return;
-    }
-    this.setState({
-      showLoginBtn: false
-    });
-    await this.callGraphSilent();
-  }
-
   render() {
+
+    var data = [
+      {"name": "Add a task", isCompleted: false, isNew: true },
+      {"name": "Task 1", isCompleted: false },
+      {"name": "Task 2", isCompleted: false },
+      {"name": "Task 3", isCompleted: true }
+    ];
+
     return (
-      <div>
-        <h2>TODO App (TypeScript)</h2>
-        <p><b>Name:</b> {this.state.userInfo.userName}</p>
-        <p><b>E-mail:</b> {this.state.userInfo.preferredUserName}</p>
-
-        {this.state.showLoginBtn && <Button content="Grant permission & get information" onClick={() => this.loginBtnClick()} primary />}
-
-        {
-          this.state.showGraphMessage &&
-          <p>
-            <h2>Profile from Microsoft Graph</h2>
-            <div>
-              <div><b>Name:</b> {this.state.profile.displayName}</div>
-              <div><b>Job title:</b> {this.state.profile.jobTitle}</div>
-              <div><b>E-mail:</b> {this.state.profile.mail}</div>
-              <div><b>UPN:</b> {this.state.profile.userPrincipalName}</div>
-              <div><b>Object id:</b> {this.state.profile.id}</div>
-            </div>
-            <h2>User Photo from Microsoft Graph</h2>
-            <div >
-              {this.state.photoObjectURL && <img src={this.state.photoObjectURL} alt="Profile Avatar" />}
-              {this.state.fetchPhotoErrorMessage && <div>{this.state.fetchPhotoErrorMessage}</div>}
-            </div>
-          </p>
-        }
-
-        {
-          this.state.showFunctionMessage &&
-          <p>
-            <h2>Message from Azure Function</h2>
-            <div>
-              {this.state.functionMessage &&<pre>{this.state.functionMessage}</pre> }
-              {this.state.functionErrorMessage && <div>{this.state.functionErrorMessage}</div>}
-            </div>
-          </p>
-        }
+      <div className="Tab">
+        <div className="Title">ToDo App</div>
+        <div className="Subtitle">Hello, {this.state.userInfo.userName}</div>
+        <div className="ToDoList">
+          {data.map(function(d, index){
+            return (
+              <li className="ToDoListItem" key={index}>{d.name}</li>
+            )
+          })}
+      </div>
       </div>
     );
   }
 }
+
 export default Tab;
