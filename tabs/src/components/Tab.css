@@ -1,15 +1,15 @@
 .Tab {
-  background-color: #343434;
-  padding: 10px 20px 10px 20px;
+  /* background-color: #343434; */
+  padding: 10px 200px 10px 20px;
 }
 
 .Title {
-  color: white;
+  /* color: white; */
   font-size: x-large;
 }
 
 .Subtitle {
-  color: #39E6F1;
+  color: cornflowerblue;
   font-size: medium;
 }
 
@@ -18,7 +18,8 @@
 }
 
 .ToDoListItem {
-  color: white;
+  /* color: white; */
   font-size: large;
   list-style-type: none;
+  padding: 5px 0px 5px 0px;
 }
