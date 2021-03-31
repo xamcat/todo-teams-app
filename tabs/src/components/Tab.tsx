@@ -45,7 +45,7 @@ class Tab extends React.Component<TabProps, TabState> {
         { "name": "Task 2", isCompleted: false },
         { "name": "Task 3", isCompleted: true }
       ],
-      newToDoItem: `test ${Date.now()}`,
+      newToDoItem: "",
     }
   }
 
