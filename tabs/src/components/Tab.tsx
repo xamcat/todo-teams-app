@@ -68,11 +68,10 @@ class Tab extends React.Component<TabProps, TabState> {
   }
 
   addNewTask(toDoItem: any, event: any) {
-    if (toDoItem.name === "")
+    if (this.state.newToDoItem === "")
       return;
 
-    console.log(toDoItem.name);
-    this.state.toDoItems.splice(1, 0, { "name": toDoItem.name, isCompleted: false });
+    this.state.toDoItems.splice(1, 0, { "name": this.state.newToDoItem, isCompleted: false });
     this.state.newToDoItem = "";
     this.setState({ ...this.state });
   }
@@ -82,7 +81,7 @@ class Tab extends React.Component<TabProps, TabState> {
   }
 
   handleToDoItemCompletionChange(toDoItem: any, event: any) {
-    toDoItem.isCompleted = event.target.value;
+    toDoItem.isCompleted = !toDoItem.isCompleted;
     this.setState({ ...this.state });
   }
 
