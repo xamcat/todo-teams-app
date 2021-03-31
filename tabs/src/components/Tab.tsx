@@ -25,6 +25,8 @@ interface TabProps {
 
 interface TabState {
   userInfo: any,
+  toDoItems: any,
+  newToDoItem: any,
 }
 
 /**
@@ -37,6 +39,13 @@ class Tab extends React.Component<TabProps, TabState> {
     super(props)
     this.state = {
       userInfo: {},
+      toDoItems: [
+        { "name": "Add a task", isCompleted: false, isNew: true },
+        { "name": "Task 1", isCompleted: false },
+        { "name": "Task 2", isCompleted: false },
+        { "name": "Task 3", isCompleted: true }
+      ],
+      newToDoItem: `test ${Date.now()}`,
     }
   }
 
@@ -59,28 +68,23 @@ class Tab extends React.Component<TabProps, TabState> {
   }
 
   addNewTask() {
-    console.log('NOW:', this.state.addNewTask);
-    this.setState({
-      addNewTask: Date.now()
-    });
+    if (this.state.newToDoItem === "")
+      return;
+
+    console.log(this.state.newToDoItem);
+    this.state.toDoItems.splice(1, 0, { "name": this.state.newToDoItem, isCompleted: false });
+    this.state.newToDoItem = "";
+    this.setState({ ...this.state });
   }
 
   render() {
-
-    var todoItems = [
-      { "name": "Add a task", isCompleted: false, isNew: true },
-      { "name": "Task 1", isCompleted: false },
-      { "name": "Task 2", isCompleted: false },
-      { "name": "Task 3", isCompleted: true }
-    ];
-
     return (
       <div className="Tab">
         <div className="Title">ToDo App</div>
         <div className="Subtitle">Hello, {this.state.userInfo.userName}</div>
         <div className="ToDoList">
           {
-            todoItems.map((todoItem, index) => {
+            this.state.toDoItems.map((todoItem: any, index: any) => {
               if (todoItem.isNew) {
                 return (
                   <li className="ToDoListItem" key={index}>
@@ -89,6 +93,7 @@ class Tab extends React.Component<TabProps, TabState> {
                       clearable
                       icon={<AddIcon />}
                       iconPosition="start"
+                      value={this.state.newToDoItem}
                       // fluid
                       styles={styles.ToDoListItemNew}
                       input={{
