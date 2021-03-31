@@ -13,20 +13,27 @@ const styles = {
   },
   ToDoListItemCompleted: {
     color: 'gray',
-    textDecoration : 'line-through'
+    textDecoration: 'line-through'
   },
   ToDoListItemNotCompleted: {
 
   }
 }
 
+interface TabProps {
+}
+
+interface TabState {
+  userInfo: any,
+}
+
 /**
  * The 'PersonalTab' component renders the main tab content
  * of your app.
  */
-class Tab extends React.Component<any> {
+class Tab extends React.Component<TabProps, TabState> {
 
-  constructor(props: any) {
+  constructor(props: TabProps) {
     super(props)
     this.state = {
       userInfo: {},
@@ -51,9 +58,11 @@ class Tab extends React.Component<any> {
     });
   }
 
-  addNewTask = () => {
-    this.setStage({addNewTask: Date.now() });
+  addNewTask() {
     console.log('NOW:', this.state.addNewTask);
+    this.setState({
+      addNewTask: Date.now()
+    });
   }
 
   render() {
@@ -65,46 +74,42 @@ class Tab extends React.Component<any> {
       { "name": "Task 3", isCompleted: true }
     ];
 
-    // TODO: fix context
-    // let context = this;
-
     return (
       <div className="Tab">
         <div className="Title">ToDo App</div>
         <div className="Subtitle">Hello, {this.state.userInfo.userName}</div>
         <div className="ToDoList">
           {
-            todoItems.map(function (todoItem, index) {
+            todoItems.map((todoItem, index) => {
               if (todoItem.isNew) {
                 return (
                   <li className="ToDoListItem" key={index}>
-                    <Input 
-                      placeholder={todoItem.name} 
-                      clearable 
-                      icon={<AddIcon />} 
-                      iconPosition="start" 
+                    <Input
+                      placeholder={todoItem.name}
+                      clearable
+                      icon={<AddIcon />}
+                      iconPosition="start"
                       // fluid
                       styles={styles.ToDoListItemNew}
                       input={{
-                        styles:{
+                        styles: {
                           background: 'transparent',
                         }
                       }}>
-                      </Input>
-                      <Button 
-                        icon={<NotesIcon />} 
-                        text
-                        iconOnly
-                        onClick={this.addNewTask}
-                      >
-                      </Button>
+                    </Input>
+                    <Button
+                      icon={<NotesIcon />}
+                      text
+                      iconOnly
+                      onClick={this.addNewTask.bind(this)}
+                    />
                   </li>
                 )
               } else {
                 return (
                   <li className="ToDoListItem" key={index}>
                     <Checkbox checked={todoItem.isCompleted} />
-                    <Text 
+                    <Text
                       styles={todoItem.isCompleted ? styles.ToDoListItemCompleted : styles.ToDoListItemNotCompleted}>{todoItem.name}
                     </Text>
                   </li>
