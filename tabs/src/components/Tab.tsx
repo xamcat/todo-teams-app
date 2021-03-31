@@ -9,14 +9,14 @@ import { Text, Input, Button, Checkbox, AddIcon, NotesIcon } from '@fluentui/rea
 
 const styles = {
   ToDoListItemNew: {
-
   },
   ToDoListItemCompleted: {
     color: 'gray',
     textDecoration: 'line-through'
   },
   ToDoListItemNotCompleted: {
-
+    color: 'black',
+    textDecoration: 'none'
   }
 }
 
@@ -67,13 +67,22 @@ class Tab extends React.Component<TabProps, TabState> {
     });
   }
 
-  addNewTask() {
-    if (this.state.newToDoItem === "")
+  addNewTask(toDoItem: any, event: any) {
+    if (toDoItem.name === "")
       return;
 
-    console.log(this.state.newToDoItem);
-    this.state.toDoItems.splice(1, 0, { "name": this.state.newToDoItem, isCompleted: false });
+    console.log(toDoItem.name);
+    this.state.toDoItems.splice(1, 0, { "name": toDoItem.name, isCompleted: false });
     this.state.newToDoItem = "";
+    this.setState({ ...this.state });
+  }
+
+  handleNewToDoItemChange(toDoItem: any, event: any) {
+    this.setState({ newToDoItem: event.target.value });
+  }
+
+  handleToDoItemCompletionChange(toDoItem: any, event: any) {
+    toDoItem.isCompleted = event.target.value;
     this.setState({ ...this.state });
   }
 
@@ -84,20 +93,22 @@ class Tab extends React.Component<TabProps, TabState> {
         <div className="Subtitle">Hello, {this.state.userInfo.userName}</div>
         <div className="ToDoList">
           {
-            this.state.toDoItems.map((todoItem: any, index: any) => {
-              if (todoItem.isNew) {
+            this.state.toDoItems.map((toDoItem: any, index: any) => {
+              if (toDoItem.isNew) {
                 return (
                   <li className="ToDoListItem" key={index}>
                     <Input
-                      placeholder={todoItem.name}
+                      placeholder={toDoItem.name}
                       clearable
                       icon={<AddIcon />}
                       iconPosition="start"
                       value={this.state.newToDoItem}
+                      onChange={this.handleNewToDoItemChange.bind(this, toDoItem)}
                       // fluid
                       styles={styles.ToDoListItemNew}
                       input={{
                         styles: {
+                          // color: 'cornflowerblue',
                           background: 'transparent',
                         }
                       }}>
@@ -106,16 +117,18 @@ class Tab extends React.Component<TabProps, TabState> {
                       icon={<NotesIcon />}
                       text
                       iconOnly
-                      onClick={this.addNewTask.bind(this)}
+                      onClick={this.addNewTask.bind(this, toDoItem)}
                     />
                   </li>
                 )
               } else {
                 return (
                   <li className="ToDoListItem" key={index}>
-                    <Checkbox checked={todoItem.isCompleted} />
+                    <Checkbox
+                      checked={toDoItem.isCompleted}
+                      onChange={this.handleToDoItemCompletionChange.bind(this, toDoItem)} />
                     <Text
-                      styles={todoItem.isCompleted ? styles.ToDoListItemCompleted : styles.ToDoListItemNotCompleted}>{todoItem.name}
+                      styles={toDoItem.isCompleted ? styles.ToDoListItemCompleted : styles.ToDoListItemNotCompleted}>{toDoItem.name}
                     </Text>
                   </li>
                 )
