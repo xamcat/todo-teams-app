@@ -67,7 +67,7 @@ class Tab extends React.Component<TabProps, TabState> {
     });
   }
 
-  addNewTask(toDoItem: any, event: any) {
+  addNewTask(toDoItem: any) {
     if (this.state.newToDoItem === "")
       return;
 
@@ -79,6 +79,13 @@ class Tab extends React.Component<TabProps, TabState> {
   handleNewToDoItemChange(toDoItem: any, event: any) {
     this.setState({ newToDoItem: event.target.value });
   }
+
+  handleNewToDoItemKeyPress(toDoItem: any, event: any) {
+    if(event.charCode !== 13)
+      return;
+
+    this.addNewTask(toDoItem);
+  }  
 
   handleToDoItemCompletionChange(toDoItem: any, event: any) {
     toDoItem.isCompleted = !toDoItem.isCompleted;
@@ -102,6 +109,7 @@ class Tab extends React.Component<TabProps, TabState> {
                       icon={<AddIcon />}
                       iconPosition="start"
                       value={this.state.newToDoItem}
+                      onKeyPress={this.handleNewToDoItemKeyPress.bind(this, toDoItem)}
                       onChange={this.handleNewToDoItemChange.bind(this, toDoItem)}
                       // fluid
                       styles={styles.ToDoListItemNew}
