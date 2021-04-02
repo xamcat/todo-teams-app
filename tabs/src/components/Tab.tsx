@@ -52,6 +52,7 @@ class Tab extends React.Component<TabProps, TabState> {
   //Learn more: https://reactjs.org/docs/react-component.html#componentdidmount
   async componentDidMount() {
     // Next steps: Error handling using the error object
+    this.loadStateFromStorage();
     await this.initMODS();
   }
 
@@ -66,20 +67,36 @@ class Tab extends React.Component<TabProps, TabState> {
     });
   }
 
+  loadStateFromStorage() {
+    var localState = localStorage.getItem("ToDoItems");
+    console.log(localState);
+
+    // TODO: implement full state save/restore
+    this.state.toDoItemNew.name = localState;
+    this.setState({ toDoItemNew: this.state.toDoItemNew });
+  }
+
+  saveStateToStorage() {
+    // TODO: implement full state save/restore
+    localStorage.setItem("ToDoItems", this.state.toDoItemNew.name);
+  }
+
+
   addNewTask(toDoItem: any) {
     if (toDoItem.name === "") {
       return;
     }
 
     this.state.toDoItems.splice(0, 0, { name: toDoItem.name, isCompleted: false });
-    //toDoItem.name = "";
     this.state.toDoItemNew.name = "";
     this.setState({ ...this.state });
+    this.saveStateToStorage();
   }
 
   handleNewToDoItemChange(toDoItem: any, event: any) {
     this.state.toDoItemNew.name = event.target.value;
     this.setState({ toDoItemNew: this.state.toDoItemNew });
+    this.saveStateToStorage();
   }
 
   handleNewToDoItemKeyPress(toDoItem: any, event: any) {
@@ -97,6 +114,7 @@ class Tab extends React.Component<TabProps, TabState> {
   handleToDoItemCompletionChange(toDoItem: any, event: any) {
     toDoItem.isCompleted = !toDoItem.isCompleted;
     this.setState({ ...this.state });
+    this.saveStateToStorage();
   }
 
   render() {
