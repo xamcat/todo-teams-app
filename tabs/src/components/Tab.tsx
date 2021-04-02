@@ -25,8 +25,8 @@ interface TabProps {
 
 interface TabState {
   userInfo: any,
+  toDoItemNew: any,
   toDoItems: any,
-  newToDoItem: any,
 }
 
 /**
@@ -39,13 +39,12 @@ class Tab extends React.Component<TabProps, TabState> {
     super(props)
     this.state = {
       userInfo: {},
+      toDoItemNew: { name: "", label: "Add a task" },
       toDoItems: [
-        { "name": "Add a task", isCompleted: false, isNew: true },
-        { "name": "Task 1", isCompleted: false },
-        { "name": "Task 2", isCompleted: false },
-        { "name": "Task 3", isCompleted: true }
+        { name: "Task 1", isCompleted: false },
+        { name: "Task 2", isCompleted: false },
+        { name: "Task 3", isCompleted: true }
       ],
-      newToDoItem: "",
     }
   }
 
@@ -68,24 +67,32 @@ class Tab extends React.Component<TabProps, TabState> {
   }
 
   addNewTask(toDoItem: any) {
-    if (this.state.newToDoItem === "")
+    if (toDoItem.name === "") {
       return;
+    }
 
-    this.state.toDoItems.splice(1, 0, { "name": this.state.newToDoItem, isCompleted: false });
-    this.state.newToDoItem = "";
+    this.state.toDoItems.splice(0, 0, { name: toDoItem.name, isCompleted: false });
+    //toDoItem.name = "";
+    this.state.toDoItemNew.name = "";
     this.setState({ ...this.state });
   }
 
   handleNewToDoItemChange(toDoItem: any, event: any) {
-    this.setState({ newToDoItem: event.target.value });
+    this.state.toDoItemNew.name = event.target.value;
+    this.setState({ toDoItemNew: this.state.toDoItemNew });
   }
 
   handleNewToDoItemKeyPress(toDoItem: any, event: any) {
-    if(event.charCode !== 13)
-      return;
-
-    this.addNewTask(toDoItem);
-  }  
+    switch (event.key) {
+      case "Escape":
+        this.state.toDoItemNew.name = "";
+        this.setState({ toDoItemNew: this.state.toDoItemNew });
+        break;
+      case "Enter":
+        this.addNewTask(toDoItem);
+        break;
+    }
+  }
 
   handleToDoItemCompletionChange(toDoItem: any, event: any) {
     toDoItem.isCompleted = !toDoItem.isCompleted;
@@ -98,48 +105,42 @@ class Tab extends React.Component<TabProps, TabState> {
         <div className="Title">ToDo App</div>
         <div className="Subtitle">Hello, {this.state.userInfo.userName}</div>
         <div className="ToDoList">
+          <li className="ToDoListItem" key="-1">
+            <Input
+              placeholder={this.state.toDoItemNew.label}
+              clearable
+              icon={<AddIcon />}
+              iconPosition="start"
+              value={this.state.toDoItemNew.name}
+              onKeyDown={this.handleNewToDoItemKeyPress.bind(this, this.state.toDoItemNew)}
+              onChange={this.handleNewToDoItemChange.bind(this, this.state.toDoItemNew)}
+              styles={styles.ToDoListItemNew}
+              input={{
+                styles: {
+                  // color: 'cornflowerblue',
+                  background: 'transparent',
+                }
+              }}>
+            </Input>
+            <Button
+              icon={<NotesIcon />}
+              text
+              iconOnly
+              onClick={this.addNewTask.bind(this, this.state.toDoItemNew)}
+            />
+          </li>
           {
             this.state.toDoItems.map((toDoItem: any, index: any) => {
-              if (toDoItem.isNew) {
-                return (
-                  <li className="ToDoListItem" key={index}>
-                    <Input
-                      placeholder={toDoItem.name}
-                      clearable
-                      icon={<AddIcon />}
-                      iconPosition="start"
-                      value={this.state.newToDoItem}
-                      onKeyPress={this.handleNewToDoItemKeyPress.bind(this, toDoItem)}
-                      onChange={this.handleNewToDoItemChange.bind(this, toDoItem)}
-                      // fluid
-                      styles={styles.ToDoListItemNew}
-                      input={{
-                        styles: {
-                          // color: 'cornflowerblue',
-                          background: 'transparent',
-                        }
-                      }}>
-                    </Input>
-                    <Button
-                      icon={<NotesIcon />}
-                      text
-                      iconOnly
-                      onClick={this.addNewTask.bind(this, toDoItem)}
-                    />
-                  </li>
-                )
-              } else {
-                return (
-                  <li className="ToDoListItem" key={index}>
-                    <Checkbox
-                      checked={toDoItem.isCompleted}
-                      onChange={this.handleToDoItemCompletionChange.bind(this, toDoItem)} />
-                    <Text
-                      styles={toDoItem.isCompleted ? styles.ToDoListItemCompleted : styles.ToDoListItemNotCompleted}>{toDoItem.name}
-                    </Text>
-                  </li>
-                )
-              }
+              return (
+                <li className="ToDoListItem" key={index}>
+                  <Checkbox
+                    checked={toDoItem.isCompleted}
+                    onChange={this.handleToDoItemCompletionChange.bind(this, toDoItem)} />
+                  <Text
+                    styles={toDoItem.isCompleted ? styles.ToDoListItemCompleted : styles.ToDoListItemNotCompleted}>{toDoItem.name}
+                  </Text>
+                </li>
+              )
             })
           }
         </div>
