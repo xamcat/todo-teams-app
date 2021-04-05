@@ -68,19 +68,17 @@ class Tab extends React.Component<TabProps, TabState> {
   }
 
   loadStateFromStorage() {
-    var localState = localStorage.getItem("ToDoItems");
-    console.log(localState);
-
-    // TODO: implement full state save/restore
-    this.state.toDoItemNew.name = localState;
-    this.setState({ toDoItemNew: this.state.toDoItemNew });
+    var localState = localStorage.getItem("ToDoItemsState");
+    if (localState) {
+      var restoredState = JSON.parse(localState);
+      this.setState({ ...restoredState });
+    }
   }
 
   saveStateToStorage() {
-    // TODO: implement full state save/restore
-    localStorage.setItem("ToDoItems", this.state.toDoItemNew.name);
+    var localState = JSON.stringify(this.state);
+    localStorage.setItem("ToDoItemsState", localState);
   }
-
 
   addNewTask(toDoItem: any) {
     if (toDoItem.name === "") {
@@ -96,7 +94,6 @@ class Tab extends React.Component<TabProps, TabState> {
   handleNewToDoItemChange(toDoItem: any, event: any) {
     this.state.toDoItemNew.name = event.target.value;
     this.setState({ toDoItemNew: this.state.toDoItemNew });
-    this.saveStateToStorage();
   }
 
   handleNewToDoItemKeyPress(toDoItem: any, event: any) {
@@ -109,6 +106,11 @@ class Tab extends React.Component<TabProps, TabState> {
         this.addNewTask(toDoItem);
         break;
     }
+  }
+
+  handleNewToDoItemBlur(toDoItem: any, event: any) {
+    console.log(event);
+    this.saveStateToStorage();
   }
 
   handleToDoItemCompletionChange(toDoItem: any, event: any) {
@@ -132,6 +134,7 @@ class Tab extends React.Component<TabProps, TabState> {
               value={this.state.toDoItemNew.name}
               onKeyDown={this.handleNewToDoItemKeyPress.bind(this, this.state.toDoItemNew)}
               onChange={this.handleNewToDoItemChange.bind(this, this.state.toDoItemNew)}
+              onBlur={this.handleNewToDoItemBlur.bind(this, this.state.toDoItemNew)}
               styles={styles.ToDoListItemNew}
               input={{
                 styles: {
