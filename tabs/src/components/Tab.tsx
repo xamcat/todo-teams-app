@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
 
-import React from 'react';
+import React, { Component, useState } from 'react';
 import './App.css';
 import './Tab.css';
+
 import { MODS } from "mods-client";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { Text, Input, Button, Checkbox, AddIcon, NotesIcon } from '@fluentui/react-northstar';
+import { Text, Input, Button, Checkbox, AddIcon, ToDoListIcon, EditIcon } from '@fluentui/react-northstar';
+import SlidingPanel from 'react-sliding-side-panel';
 
 const styles = {
   ToDoListItemNew: {
@@ -28,6 +30,7 @@ interface TabState {
   userInfo: any,
   toDoItemNew: any,
   toDoItems: any,
+  isDoItemDetailsOpened: boolean,
 }
 
 /**
@@ -46,6 +49,7 @@ class Tab extends React.Component<TabProps, TabState> {
         { name: "Task 2", isCompleted: false },
         { name: "Task 3", isCompleted: true }
       ],
+      isDoItemDetailsOpened: true,
     }
   }
 
@@ -116,6 +120,11 @@ class Tab extends React.Component<TabProps, TabState> {
     this.saveStateToStorage();
   }
 
+  clearAllTasks() {
+    this.state.toDoItems = [];
+    this.setState({ ...this.state });
+  }
+
   handleNewToDoItemChange(toDoItem: any, event: any) {
     this.state.toDoItemNew.name = event.target.value;
     this.setState({ toDoItemNew: this.state.toDoItemNew });
@@ -145,7 +154,9 @@ class Tab extends React.Component<TabProps, TabState> {
   }
 
   handleToDoItemSelected(toDoItem: any, event: any) {
-    console.log(`item ${toDoItem.name} has been selected`);
+    // console.log(`item ${toDoItem.name} has been selected`);
+    this.state.isDoItemDetailsOpened = !this.state.isDoItemDetailsOpened;
+    this.setState({ isDoItemDetailsOpened: this.state.isDoItemDetailsOpened });
   }
 
   render() {
@@ -173,10 +184,16 @@ class Tab extends React.Component<TabProps, TabState> {
               }}>
             </Input>
             <Button
-              icon={<NotesIcon />}
+              icon={<EditIcon />}
               text
               iconOnly
               onClick={this.addNewTask.bind(this, this.state.toDoItemNew)}
+            />
+            <Button
+              icon={<ToDoListIcon />}
+              text
+              iconOnly
+              onClick={this.clearAllTasks.bind(this)}
             />
           </li>
           {
@@ -194,6 +211,16 @@ class Tab extends React.Component<TabProps, TabState> {
             })
           }
         </div>
+        <SlidingPanel
+            type={'right'}
+            isOpen={this.state.isDoItemDetailsOpened}
+            size={30}
+          >
+            <div>
+              <div>My Panel Content</div>
+              <button onClick={() => this.setState({ isDoItemDetailsOpened: false })}>close</button>
+            </div>
+          </SlidingPanel>
       </div>
     );
   }
