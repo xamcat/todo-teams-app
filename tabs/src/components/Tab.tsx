@@ -5,6 +5,7 @@ import React from 'react';
 import './App.css';
 import './Tab.css';
 import { MODS } from "mods-client";
+import * as microsoftTeams from "@microsoft/teams-js";
 import { Text, Input, Button, Checkbox, AddIcon, NotesIcon } from '@fluentui/react-northstar';
 
 const styles = {
@@ -54,6 +55,7 @@ class Tab extends React.Component<TabProps, TabState> {
     // Next steps: Error handling using the error object
     this.loadStateFromStorage();
     await this.initMODS();
+    microsoftTeams.initialize();
   }
 
   async initMODS() {
@@ -78,6 +80,29 @@ class Tab extends React.Component<TabProps, TabState> {
   saveStateToStorage() {
     var localState = JSON.stringify(this.state);
     localStorage.setItem("ToDoItemsState", localState);
+  }
+
+  selectMedia() {
+    let imageProp: microsoftTeams.media.ImageProps = {
+      sources: [microsoftTeams.media.Source.Gallery],
+      startMode: microsoftTeams.media.CameraStartMode.Photo,
+      ink: false,
+      cameraSwitcher: false,
+      textSticker: false,
+      enableFilter: true,
+    };
+
+    let mediaInput: microsoftTeams.media.MediaInputs = {
+      mediaType: microsoftTeams.media.MediaType.Image,
+      maxMediaCount: 10,
+      imageProps: imageProp
+    };
+
+    // requests for access but then crashes the browser
+    // navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+    microsoftTeams.media.selectMedia(mediaInput, (error: microsoftTeams.SdkError, files: microsoftTeams.media.File[]) => {
+      console.log(`Do work with images: ${error}`);
+    });
   }
 
   addNewTask(toDoItem: any) {
@@ -119,6 +144,10 @@ class Tab extends React.Component<TabProps, TabState> {
     this.saveStateToStorage();
   }
 
+  handleToDoItemSelected(toDoItem: any, event: any) {
+    console.log(`item ${toDoItem.name} has been selected`);
+  }
+
   render() {
     return (
       <div className="Tab">
@@ -153,7 +182,7 @@ class Tab extends React.Component<TabProps, TabState> {
           {
             this.state.toDoItems.map((toDoItem: any, index: any) => {
               return (
-                <li className="ToDoListItem" key={index}>
+                <li className="ToDoListItem" key={index} onClick={this.handleToDoItemSelected.bind(this, toDoItem)}>
                   <Checkbox
                     checked={toDoItem.isCompleted}
                     onChange={this.handleToDoItemCompletionChange.bind(this, toDoItem)} />
