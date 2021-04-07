@@ -2,13 +2,11 @@
 // Licensed under the MIT License.
 
 import React, { Component, useState } from 'react';
-import './App.css';
-import './Tab.css';
-
 import { MODS } from "mods-client";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { Text, Input, Button, Checkbox, AddIcon, ToDoListIcon, EditIcon } from '@fluentui/react-northstar';
-import SlidingPanel from 'react-sliding-side-panel';
+import { Text, Input, Button, Checkbox, AddIcon, ToDoListIcon, EditIcon, CloseIcon, TrashCanIcon } from '@fluentui/react-northstar';
+import './App.css';
+import './Tab.css';
 
 const styles = {
   ToDoListItemNew: {
@@ -29,8 +27,8 @@ interface TabProps {
 interface TabState {
   userInfo: any,
   toDoItemNew: any,
+  toDoItemDetails: any,
   toDoItems: any,
-  isDoItemDetailsOpened: boolean,
 }
 
 /**
@@ -44,12 +42,12 @@ class Tab extends React.Component<TabProps, TabState> {
     this.state = {
       userInfo: {},
       toDoItemNew: { name: "", label: "Add a task" },
+      toDoItemDetails: null,
       toDoItems: [
         { name: "Task 1", isCompleted: false },
         { name: "Task 2", isCompleted: false },
         { name: "Task 3", isCompleted: true }
       ],
-      isDoItemDetailsOpened: true,
     }
   }
 
@@ -122,7 +120,26 @@ class Tab extends React.Component<TabProps, TabState> {
 
   clearAllTasks() {
     this.state.toDoItems = [];
+    this.state.toDoItemDetails = null;
     this.setState({ ...this.state });
+  }
+
+  removeToDoTask(toDoItem: any) {
+    if (!toDoItem) {
+      return;
+    }
+
+    const index = this.state.toDoItems.indexOf(toDoItem);
+    if (index > -1) {
+      this.state.toDoItems.splice(index, 1);
+    }
+
+    if (this.state.toDoItemDetails === toDoItem) {
+      this.state.toDoItemDetails = null;
+    }
+
+    this.setState({ ...this.state });
+    this.saveStateToStorage();
   }
 
   handleNewToDoItemChange(toDoItem: any, event: any) {
@@ -154,9 +171,18 @@ class Tab extends React.Component<TabProps, TabState> {
   }
 
   handleToDoItemSelected(toDoItem: any, event: any) {
-    // console.log(`item ${toDoItem.name} has been selected`);
-    this.state.isDoItemDetailsOpened = !this.state.isDoItemDetailsOpened;
-    this.setState({ isDoItemDetailsOpened: this.state.isDoItemDetailsOpened });
+    if (!toDoItem) {
+      return;
+    }
+
+    this.state.isDoItemDetailsOpened = (toDoItem && toDoItem != this.state.toDoItemDetails) ? true : false;
+    this.state.toDoItemDetails = toDoItem;
+    this.setState({ ...this.state });
+  }
+
+  handleToDoItemDeselected() {
+    this.state.toDoItemDetails = null;
+    this.setState({ ...this.state });
   }
 
   render() {
@@ -164,66 +190,86 @@ class Tab extends React.Component<TabProps, TabState> {
       <div className="Tab">
         <div className="Title">ToDo App</div>
         <div className="Subtitle">Hello, {this.state.userInfo.userName}</div>
-        <div className="ToDoList">
-          <li className="ToDoListItem" key="-1">
-            <Input
-              placeholder={this.state.toDoItemNew.label}
-              clearable
-              icon={<AddIcon />}
-              iconPosition="start"
-              value={this.state.toDoItemNew.name}
-              onKeyDown={this.handleNewToDoItemKeyPress.bind(this, this.state.toDoItemNew)}
-              onChange={this.handleNewToDoItemChange.bind(this, this.state.toDoItemNew)}
-              onBlur={this.handleNewToDoItemBlur.bind(this, this.state.toDoItemNew)}
-              styles={styles.ToDoListItemNew}
-              input={{
-                styles: {
-                  // color: 'cornflowerblue',
-                  background: 'transparent',
-                }
-              }}>
-            </Input>
-            <Button
-              icon={<EditIcon />}
-              text
-              iconOnly
-              onClick={this.addNewTask.bind(this, this.state.toDoItemNew)}
-            />
-            <Button
-              icon={<ToDoListIcon />}
-              text
-              iconOnly
-              onClick={this.clearAllTasks.bind(this)}
-            />
-          </li>
-          {
-            this.state.toDoItems.map((toDoItem: any, index: any) => {
-              return (
-                <li className="ToDoListItem" key={index} onClick={this.handleToDoItemSelected.bind(this, toDoItem)}>
-                  <Checkbox
-                    checked={toDoItem.isCompleted}
-                    onChange={this.handleToDoItemCompletionChange.bind(this, toDoItem)} />
-                  <Text
-                    styles={toDoItem.isCompleted ? styles.ToDoListItemCompleted : styles.ToDoListItemNotCompleted}>{toDoItem.name}
-                  </Text>
-                </li>
-              )
-            })
+        <div className="FlexContainer">
+          <div className="FlexItemMain">
+            <div className="ToDoList">
+              <li className="ToDoListItem" key="-1">
+                <Input
+                  placeholder={this.state.toDoItemNew.label}
+                  clearable
+                  icon={<AddIcon />}
+                  iconPosition="start"
+                  value={this.state.toDoItemNew.name}
+                  onKeyDown={this.handleNewToDoItemKeyPress.bind(this, this.state.toDoItemNew)}
+                  onChange={this.handleNewToDoItemChange.bind(this, this.state.toDoItemNew)}
+                  onBlur={this.handleNewToDoItemBlur.bind(this, this.state.toDoItemNew)}
+                  styles={styles.ToDoListItemNew}
+                  input={{
+                    styles: {
+                      // color: 'cornflowerblue',
+                      background: 'transparent',
+                    }
+                  }}>
+                </Input>
+                <Button
+                  icon={<ToDoListIcon />}
+                  text
+                  iconOnly
+                  onClick={this.addNewTask.bind(this, this.state.toDoItemNew)}
+                />
+                <Button
+                  icon={<TrashCanIcon />}
+                  text
+                  iconOnly
+                  onClick={this.clearAllTasks.bind(this)}
+                />
+              </li>
+              {
+                this.state.toDoItems.map((toDoItem: any, index: any) => {
+                  return (
+                    <li className="ToDoListItem" key={index} onClick={this.handleToDoItemSelected.bind(this, toDoItem)}>
+                      <Checkbox
+                        checked={toDoItem.isCompleted}
+                        onChange={this.handleToDoItemCompletionChange.bind(this, toDoItem)} />
+                      <Text
+                        styles={toDoItem.isCompleted ? styles.ToDoListItemCompleted : styles.ToDoListItemNotCompleted}>{toDoItem.name}
+                      </Text>
+                    </li>
+                  )
+                })
+              }
+            </div>
+          </div>
+          {this.state.toDoItemDetails !== null &&
+            <div className="FlexItemDetails">
+              <Text>{this.state.toDoItemDetails?.name}</Text>
+              <br />
+              <Button
+                icon={<TrashCanIcon />}
+                text
+                iconOnly
+                onClick={this.removeToDoTask.bind(this, this.state.toDoItemDetails)} />
+              <Button
+                icon={<CloseIcon />}
+                text
+                iconOnly
+                onClick={this.handleToDoItemDeselected.bind(this)} />
+            </div>
           }
         </div>
-        <SlidingPanel
-            type={'right'}
-            isOpen={this.state.isDoItemDetailsOpened}
-            size={30}
-          >
-            <div>
-              <div>My Panel Content</div>
-              <button onClick={() => this.setState({ isDoItemDetailsOpened: false })}>close</button>
-            </div>
-          </SlidingPanel>
       </div>
     );
   }
+
+
 }
+
+// class ToDoItemDetails extends React.Component {
+//   render() {
+//     return (
+
+//     );
+//   }
+// }
 
 export default Tab;

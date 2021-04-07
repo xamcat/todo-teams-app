@@ -1,6 +1,6 @@
 .Tab {
   /* background-color: #343434; */
-  padding: 10px 200px 10px 20px;
+  padding: 10px 20px 10px 20px;
 }
 
 .Title {
@@ -13,8 +13,27 @@
   font-size: medium;
 }
 
-.ToDoList {
+
+.FlexContainer {
+  display: flex;
   padding: 20px 0px 20px 0px;
+}
+
+.FlexItemMain {
+  flex-grow: 1;
+  /* background-color: grey; */
+  /* padding: 10px; */
+}
+
+.FlexItemDetails {
+  width: 400px;
+  background-color: lightgray;
+  display: block;
+  padding: 10px;
+}
+
+.ToDoList {
+
 }
 
 .ToDoListItem {
@@ -26,5 +45,5 @@
 }
 
 .ToDoItemDetails {
-  background-color: lightgrey;
+  /* background-color: lightgrey; */
 }
