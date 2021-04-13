@@ -36,7 +36,6 @@
 
 .FlexItemDetails {
   width: 400px;
-  /* min-height: 400px; */
   height: 100%;
   background-color: #f0f0f0;
   display: flex;
@@ -45,7 +44,15 @@
 
 .FlexItemDetailsContent {
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.FlexItemDetailsContentField {
+  background-color: #e8e8e8;
   padding: 10px;
+  margin: 10px 10px 0px 10px;
+  font-size: x-large;
 }
 
 .FlexItemDetailsToolbar {
@@ -55,9 +62,7 @@
   flex-direction: row;
 }
 
-.FlexItemDetailsToolbarLeft {
-  
-}
+.FlexItemDetailsToolbarLeft {}
 
 .FlexItemDetailsToolbarMiddle {
   padding: 5px;
@@ -66,5 +71,4 @@
   justify-content: center;
 }
 
-.FlexItemDetailsToolbarRight {
-}
+.FlexItemDetailsToolbarRight {}

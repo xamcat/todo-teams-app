@@ -4,7 +4,7 @@
 import React, { Component, useState } from 'react';
 import { MODS } from "mods-client";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { Text, Input, Button, Checkbox, AddIcon, ToDoListIcon, MenuIcon, CloseIcon, TrashCanIcon, SendIcon, ArrowRightIcon } from '@fluentui/react-northstar';
+import { Text, Input, Button, Checkbox, Datepicker, AddIcon, ToDoListIcon, MenuIcon, CloseIcon, TrashCanIcon, SendIcon, ArrowRightIcon, TeamCreateIcon, UserFriendsIcon, FilesImageIcon, CalendarIcon, NotesIcon } from '@fluentui/react-northstar';
 import './App.css';
 import './Tab.css';
 
@@ -243,7 +243,64 @@ class Tab extends React.Component<TabProps, TabState> {
           {this.state.toDoItemDetails !== null &&
             <div className="FlexItemDetails">
               <div className="FlexItemDetailsContent">
-                <Text>{this.state.toDoItemDetails?.name}</Text>
+                <div className="FlexItemDetailsContentField">
+                  <Checkbox
+                    checked={this.state.toDoItemDetails.isCompleted}
+                    onChange={this.handleToDoItemCompletionChange.bind(this, this.state.toDoItemDetails)} />
+                  <Text
+                    styles={this.state.toDoItemDetails.isCompleted ? styles.ToDoListItemCompleted : styles.ToDoListItemNotCompleted}>{this.state.toDoItemDetails.name}
+                  </Text>
+                </div>
+                <div className="FlexItemDetailsContentField">
+                  <Input
+                    clearable
+                    icon={<NotesIcon />}
+                    label="Notes"
+                    labelPosition="inside"
+                    // value={this.state.toDoItemNew.name}
+                    // onKeyDown={this.handleNewToDoItemKeyPress.bind(this, this.state.toDoItemNew)}
+                    // onChange={this.handleNewToDoItemChange.bind(this, this.state.toDoItemNew)}
+                    // onBlur={this.handleNewToDoItemBlur.bind(this, this.state.toDoItemNew)}
+                    input={{
+                      styles: {
+                        background: 'transparent',
+                        width: 350
+                      }
+                    }} />
+                </div>
+                <div className="FlexItemDetailsContentField">
+                  {/* <CalendarIcon /> */}
+                  <Datepicker
+                    daysToSelectInDayView={1}
+                    input={{
+                      styles: {
+                        background: 'transparent',
+                        width: 315
+                      }
+                    }} />
+                </div>
+                <div className="FlexItemDetailsContentField">
+                  <Input
+                    clearable
+                    icon={<TeamCreateIcon />}
+                    label="People"
+                    labelPosition="inside"
+                    // value={this.state.toDoItemNew.name}
+                    // onKeyDown={this.handleNewToDoItemKeyPress.bind(this, this.state.toDoItemNew)}
+                    // onChange={this.handleNewToDoItemChange.bind(this, this.state.toDoItemNew)}
+                    // onBlur={this.handleNewToDoItemBlur.bind(this, this.state.toDoItemNew)}
+                    input={{
+                      styles: {
+                        background: 'transparent',
+                        width: 350
+                      }
+                    }}>
+                  </Input>
+                </div>
+                <div className="FlexItemDetailsContentField">
+                  <FilesImageIcon />
+                  <Text>   [TBD] Attachments...</Text>
+                </div>
               </div>
               <div className="FlexItemDetailsToolbar">
                 <div className="FlexItemDetailsToolbarLeft">
