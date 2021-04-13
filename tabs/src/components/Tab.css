@@ -1,6 +1,7 @@
 .Tab {
-  /* background-color: #343434; */
   padding: 10px 20px 10px 20px;
+  height: 100%;
+  overflow: scroll;
 }
 
 .Title {
@@ -13,37 +14,57 @@
   font-size: medium;
 }
 
-
-.FlexContainer {
-  display: flex;
-  padding: 20px 0px 20px 0px;
-}
-
-.FlexItemMain {
-  flex-grow: 1;
-  /* background-color: grey; */
-  /* padding: 10px; */
-}
-
-.FlexItemDetails {
-  width: 400px;
-  background-color: lightgray;
-  display: block;
-  padding: 10px;
-}
-
-.ToDoList {
-
-}
+.ToDoList {}
 
 .ToDoListItem {
-  /* color: white; */
   font-size: large;
   list-style-type: none;
   padding: 5px 0px 5px 0px;
   cursor: pointer;
 }
 
-.ToDoItemDetails {
-  /* background-color: lightgrey; */
+.FlexContainer {
+  display: flex;
+  padding: 20px 0px 20px 0px;
+  height: 90%;
+}
+
+.FlexItemMain {
+  flex-grow: 1;
+  /* background-color: grey; */
+}
+
+.FlexItemDetails {
+  width: 400px;
+  /* min-height: 400px; */
+  height: 100%;
+  background-color: #f0f0f0;
+  display: flex;
+  flex-direction: column;
+}
+
+.FlexItemDetailsContent {
+  flex-grow: 1;
+  padding: 10px;
+}
+
+.FlexItemDetailsToolbar {
+  background-color: #e0e0e0;
+  padding: 10px;
+  display: flex;
+  flex-direction: row;
+}
+
+.FlexItemDetailsToolbarLeft {
+  
+}
+
+.FlexItemDetailsToolbarMiddle {
+  padding: 5px;
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.FlexItemDetailsToolbarRight {
 }

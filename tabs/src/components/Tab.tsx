@@ -4,7 +4,7 @@
 import React, { Component, useState } from 'react';
 import { MODS } from "mods-client";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { Text, Input, Button, Checkbox, AddIcon, ToDoListIcon, EditIcon, CloseIcon, TrashCanIcon } from '@fluentui/react-northstar';
+import { Text, Input, Button, Checkbox, AddIcon, ToDoListIcon, MenuIcon, CloseIcon, TrashCanIcon, SendIcon, ArrowRightIcon } from '@fluentui/react-northstar';
 import './App.css';
 import './Tab.css';
 
@@ -212,7 +212,7 @@ class Tab extends React.Component<TabProps, TabState> {
                   }}>
                 </Input>
                 <Button
-                  icon={<ToDoListIcon />}
+                  icon={<SendIcon />}
                   text
                   iconOnly
                   onClick={this.addNewTask.bind(this, this.state.toDoItemNew)}
@@ -242,18 +242,29 @@ class Tab extends React.Component<TabProps, TabState> {
           </div>
           {this.state.toDoItemDetails !== null &&
             <div className="FlexItemDetails">
-              <Text>{this.state.toDoItemDetails?.name}</Text>
-              <br />
-              <Button
-                icon={<TrashCanIcon />}
-                text
-                iconOnly
-                onClick={this.removeToDoTask.bind(this, this.state.toDoItemDetails)} />
-              <Button
-                icon={<CloseIcon />}
-                text
-                iconOnly
-                onClick={this.handleToDoItemDeselected.bind(this)} />
+              <div className="FlexItemDetailsContent">
+                <Text>{this.state.toDoItemDetails?.name}</Text>
+              </div>
+              <div className="FlexItemDetailsToolbar">
+                <div className="FlexItemDetailsToolbarLeft">
+                  <Button
+                    icon={<ArrowRightIcon />}
+                    text
+                    iconOnly
+                    onClick={this.handleToDoItemDeselected.bind(this)} />
+                </div>
+                <div className="FlexItemDetailsToolbarMiddle">
+                  Created 2021-10-03 12:30 PM
+                </div>
+                <div className="FlexItemDetailsToolbarRight">
+                  <Button
+                    icon={<TrashCanIcon />}
+                    text
+                    iconOnly
+                    onClick={this.removeToDoTask.bind(this, this.state.toDoItemDetails)}
+                  />
+                </div>
+              </div>
             </div>
           }
         </div>
