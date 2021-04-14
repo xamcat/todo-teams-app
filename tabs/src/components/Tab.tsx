@@ -271,6 +271,7 @@ class Tab extends React.Component<TabProps, TabState> {
                 <div className="FlexItemDetailsContentField">
                   {/* <CalendarIcon /> */}
                   <Datepicker
+                    allowManualInput={false}
                     daysToSelectInDayView={1}
                     input={{
                       styles: {
@@ -297,7 +298,7 @@ class Tab extends React.Component<TabProps, TabState> {
                     }}>
                   </Input>
                 </div>
-                <div className="FlexItemDetailsContentField">
+                <div className="FlexItemDetailsContentFieldAttachments">
                   <FilesImageIcon />
                   <Text>   [TBD] Attachments...</Text>
                 </div>

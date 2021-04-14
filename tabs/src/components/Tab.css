@@ -55,6 +55,14 @@
   font-size: x-large;
 }
 
+.FlexItemDetailsContentFieldAttachments {
+  background-color: #e8e8e8;
+  padding: 10px;
+  margin: 10px 10px 10px 10px;
+  font-size: x-large;
+  flex-grow: 1;
+}
+
 .FlexItemDetailsToolbar {
   background-color: #e0e0e0;
   padding: 10px;
