@@ -23,6 +23,16 @@
   cursor: pointer;
 }
 
+.ToDoListItemCheckbox {
+  align-content: center;
+}
+
+.ToDoListItemUuid {
+  align-content: center;
+  color: darkgray;
+  font-size: x-small;
+}
+
 .FlexContainer {
   display: flex;
   padding: 20px 0px 20px 0px;
@@ -50,13 +60,18 @@
 
 .FlexItemDetailsContentField {
   background-color: #e8e8e8;
+  /* background-color: white; */
   padding: 10px;
   margin: 10px 10px 0px 10px;
   font-size: x-large;
+  display: flex;
+  flex-direction: row;
+  align-content: center;
 }
 
 .FlexItemDetailsContentFieldAttachments {
   background-color: #e8e8e8;
+  /* background-color: white; */
   padding: 10px;
   margin: 10px 10px 10px 10px;
   font-size: x-large;
@@ -68,15 +83,19 @@
   padding: 10px;
   display: flex;
   flex-direction: row;
+  align-items: center;
 }
 
-.FlexItemDetailsToolbarLeft {}
+.FlexItemDetailsToolbarLeft {
+}
 
 .FlexItemDetailsToolbarMiddle {
   padding: 5px;
   flex-grow: 1;
   display: flex;
   justify-content: center;
+  flex-direction: column;
+  text-align: center;
 }
 
 .FlexItemDetailsToolbarRight {}

@@ -1,10 +1,8 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
-
 import React, { Component, useState } from 'react';
 import { MODS } from "mods-client";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { Text, Input, Button, Checkbox, Datepicker, AddIcon, ToDoListIcon, MenuIcon, CloseIcon, TrashCanIcon, SendIcon, ArrowRightIcon, TeamCreateIcon, UserFriendsIcon, FilesImageIcon, CalendarIcon, NotesIcon } from '@fluentui/react-northstar';
+import { Text, Input, Button, Checkbox, Datepicker, AddIcon, ToDoListIcon, MenuIcon, CloseIcon, CheckmarkCircleIcon, ParticipantAddIcon, TrashCanIcon, SendIcon, ArrowRightIcon, TeamCreateIcon, UserFriendsIcon, FilesImageIcon, CalendarIcon, NotesIcon } from '@fluentui/react-northstar';
+import { v4 as uuid } from "uuid";
 import './App.css';
 import './Tab.css';
 
@@ -31,30 +29,29 @@ interface TabState {
   toDoItems: any,
 }
 
-/**
- * The 'PersonalTab' component renders the main tab content
- * of your app.
- */
 class Tab extends React.Component<TabProps, TabState> {
 
   constructor(props: TabProps) {
     super(props)
     this.state = {
       userInfo: {},
-      toDoItemNew: { name: "", label: "Add a task" },
+      toDoItemNew: {
+        id: "",
+        name: "",
+        isCompleted: false,
+        notes: "",
+        dueDate: null,
+        createdDate: null,
+        people: null,
+        attachments: null,
+        label: "Add a task"
+      },
       toDoItemDetails: null,
-      toDoItems: [
-        { name: "Task 1", isCompleted: false },
-        { name: "Task 2", isCompleted: false },
-        { name: "Task 3", isCompleted: true }
-      ],
+      toDoItems: [],
     }
   }
 
-  //React lifecycle method that gets called once a component has finished mounting
-  //Learn more: https://reactjs.org/docs/react-component.html#componentdidmount
   async componentDidMount() {
-    // Next steps: Error handling using the error object
     this.loadStateFromStorage();
     await this.initMODS();
     microsoftTeams.initialize();
@@ -76,6 +73,13 @@ class Tab extends React.Component<TabProps, TabState> {
     if (localState) {
       var restoredState = JSON.parse(localState);
       this.setState({ ...restoredState });
+    } else {
+      this.state.toDoItems = [
+        { id: uuid(), name: "Task 1", isCompleted: false, notes: "Notes for task 1", dueDate: Date.now(), createdDate: Date.now(), people: null, attachments: null },
+        { id: uuid(), name: "Task 2", isCompleted: false, notes: "Notes for task 2", dueDate: Date.now(), createdDate: Date.now(), people: null, attachments: null },
+        { id: uuid(), name: "Task 3", isCompleted: true, notes: "Notes for task 3", dueDate: Date.now(), createdDate: Date.now(), people: null, attachments: null }
+      ]
+      this.setState({ ...this.state });
     }
   }
 
@@ -112,7 +116,16 @@ class Tab extends React.Component<TabProps, TabState> {
       return;
     }
 
-    this.state.toDoItems.splice(0, 0, { name: toDoItem.name, isCompleted: false });
+    this.state.toDoItems.splice(0, 0, {
+      id: uuid(),
+      name: toDoItem.name,
+      isCompleted: false,
+      notes: "",
+      dueDate: null,
+      createdDate: Date.now(),
+      people: null,
+      attachments: null
+    });
     this.state.toDoItemNew.name = "";
     this.setState({ ...this.state });
     this.saveStateToStorage();
@@ -140,6 +153,29 @@ class Tab extends React.Component<TabProps, TabState> {
 
     this.setState({ ...this.state });
     this.saveStateToStorage();
+  }
+
+  handleToDoItemDetailsNameChange(toDoItem: any, event: any) {
+    this.state.toDoItemDetails.name = event.target.value;
+    this.setState({ toDoItemDetails: this.state.toDoItemDetails });
+  }
+
+  handleToDoItemDetailsNotesChange(toDoItem: any, event: any) {
+    this.state.toDoItemDetails.notes = event.target.value;
+    this.setState({ toDoItemDetails: this.state.toDoItemDetails });
+  }
+
+  handleToDoItemDetailsDateChange(toDoItem: any, event: any) {
+    this.state.toDoItemDetails.dueDate = event.target.value;
+    this.setState({ toDoItemDetails: this.state.toDoItemDetails });
+  }
+
+  handleToDoItemDetailsPeopleChange(toDoItem: any, event: any) {
+    this.state.toDoItemDetails.people = event.target.value;
+    this.setState({ toDoItemDetails: this.state.toDoItemDetails });
+
+    // var client = MODS.getMicrosoftGraphClient();
+    // client.api.
   }
 
   handleNewToDoItemChange(toDoItem: any, event: any) {
@@ -180,9 +216,13 @@ class Tab extends React.Component<TabProps, TabState> {
     this.setState({ ...this.state });
   }
 
-  handleToDoItemDeselected() {
+  handleToDoItemDeselected(saveState: boolean) {
     this.state.toDoItemDetails = null;
     this.setState({ ...this.state });
+
+    if (saveState === true) {
+      this.saveStateToStorage();
+    }
   }
 
   render() {
@@ -229,6 +269,7 @@ class Tab extends React.Component<TabProps, TabState> {
                   return (
                     <li className="ToDoListItem" key={index} onClick={this.handleToDoItemSelected.bind(this, toDoItem)}>
                       <Checkbox
+                        className="ToDoListItemCheckbox"
                         checked={toDoItem.isCompleted}
                         onChange={this.handleToDoItemCompletionChange.bind(this, toDoItem)} />
                       <Text
@@ -245,11 +286,21 @@ class Tab extends React.Component<TabProps, TabState> {
               <div className="FlexItemDetailsContent">
                 <div className="FlexItemDetailsContentField">
                   <Checkbox
+                    className="ToDoListItemCheckbox"
                     checked={this.state.toDoItemDetails.isCompleted}
-                    onChange={this.handleToDoItemCompletionChange.bind(this, this.state.toDoItemDetails)} />
-                  <Text
-                    styles={this.state.toDoItemDetails.isCompleted ? styles.ToDoListItemCompleted : styles.ToDoListItemNotCompleted}>{this.state.toDoItemDetails.name}
-                  </Text>
+                    toggle
+                    onChange={this.handleToDoItemCompletionChange.bind(this, this.state.toDoItemDetails)}
+                  />
+                  <Input
+                    value={this.state.toDoItemDetails.name}
+                    onChange={this.handleToDoItemDetailsNameChange.bind(this, this.state.toDoItemDetails)}
+                    input={{
+                      styles: {
+                        background: 'transparent',
+                        width: 300,
+                        textDecoration: this.state.toDoItemDetails.isCompleted ? 'line-through' : 'none'
+                      }
+                    }} />
                 </div>
                 <div className="FlexItemDetailsContentField">
                   <Input
@@ -257,10 +308,8 @@ class Tab extends React.Component<TabProps, TabState> {
                     icon={<NotesIcon />}
                     label="Notes"
                     labelPosition="inside"
-                    // value={this.state.toDoItemNew.name}
-                    // onKeyDown={this.handleNewToDoItemKeyPress.bind(this, this.state.toDoItemNew)}
-                    // onChange={this.handleNewToDoItemChange.bind(this, this.state.toDoItemNew)}
-                    // onBlur={this.handleNewToDoItemBlur.bind(this, this.state.toDoItemNew)}
+                    value={this.state.toDoItemDetails.notes}
+                    onChange={this.handleToDoItemDetailsNotesChange.bind(this, this.state.toDoItemDetails)}
                     input={{
                       styles: {
                         background: 'transparent',
@@ -273,6 +322,9 @@ class Tab extends React.Component<TabProps, TabState> {
                   <Datepicker
                     allowManualInput={false}
                     daysToSelectInDayView={1}
+                    //defaultSelectedDate={this.state.toDoItemDetails.dueDate} // TODO: defaultSelectedDate and value are not recognized
+                    value={new Date(this.state.toDoItemDetails.dueDate)}
+                    onSelectDate={this.handleToDoItemDetailsDateChange.bind(this, this.state.toDoItemDetails)}
                     input={{
                       styles: {
                         background: 'transparent',
@@ -283,13 +335,11 @@ class Tab extends React.Component<TabProps, TabState> {
                 <div className="FlexItemDetailsContentField">
                   <Input
                     clearable
-                    icon={<TeamCreateIcon />}
+                    icon={<ParticipantAddIcon />}
                     label="People"
                     labelPosition="inside"
-                    // value={this.state.toDoItemNew.name}
-                    // onKeyDown={this.handleNewToDoItemKeyPress.bind(this, this.state.toDoItemNew)}
-                    // onChange={this.handleNewToDoItemChange.bind(this, this.state.toDoItemNew)}
-                    // onBlur={this.handleNewToDoItemBlur.bind(this, this.state.toDoItemNew)}
+                    value={this.state.toDoItemDetails.people}
+                    onChange={this.handleToDoItemDetailsPeopleChange.bind(this, this.state.toDoItemDetails)}
                     input={{
                       styles: {
                         background: 'transparent',
@@ -309,10 +359,15 @@ class Tab extends React.Component<TabProps, TabState> {
                     icon={<ArrowRightIcon />}
                     text
                     iconOnly
-                    onClick={this.handleToDoItemDeselected.bind(this)} />
+                    onClick={this.handleToDoItemDeselected.bind(this, true)} />
                 </div>
                 <div className="FlexItemDetailsToolbarMiddle">
-                  Created 2021-10-03 12:30 PM
+                  <div>
+                    Created {new Date(this.state.toDoItemDetails.createdDate).toLocaleString()}
+                  </div>
+                  <div className="ToDoListItemUuid">
+                    {this.state.toDoItemDetails.id}Î
+                  </div>
                 </div>
                 <div className="FlexItemDetailsToolbarRight">
                   <Button
@@ -329,16 +384,6 @@ class Tab extends React.Component<TabProps, TabState> {
       </div>
     );
   }
-
-
 }
-
-// class ToDoItemDetails extends React.Component {
-//   render() {
-//     return (
-
-//     );
-//   }
-// }
 
 export default Tab;
