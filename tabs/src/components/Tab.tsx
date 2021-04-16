@@ -1,7 +1,7 @@
 import React, { Component, useState } from 'react';
 import { MODS } from "mods-client";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { Text, Input, Button, Checkbox, Datepicker, AddIcon, ToDoListIcon, MenuIcon, CloseIcon, CheckmarkCircleIcon, ParticipantAddIcon, TrashCanIcon, SendIcon, ArrowRightIcon, TeamCreateIcon, UserFriendsIcon, FilesImageIcon, CalendarIcon, NotesIcon } from '@fluentui/react-northstar';
+import { Text, Input, Button, Checkbox, Datepicker, AddIcon, ToDoListIcon, MenuIcon, LockIcon, CloseIcon, CheckmarkCircleIcon, ParticipantAddIcon, TrashCanIcon, SendIcon, ArrowRightIcon, TeamCreateIcon, UserFriendsIcon, FilesImageIcon, CalendarIcon, NotesIcon } from '@fluentui/react-northstar';
 import { v4 as uuid } from "uuid";
 import './App.css';
 import './Tab.css';
@@ -66,6 +66,11 @@ class Tab extends React.Component<TabProps, TabState> {
     this.setState({
       userInfo: userInfo
     });
+  }
+
+  async loginMods() {
+    await MODS.popupLoginPage();
+    //await this.callGraphSilent();
   }
 
   loadStateFromStorage() {
@@ -262,6 +267,12 @@ class Tab extends React.Component<TabProps, TabState> {
                   text
                   iconOnly
                   onClick={this.clearAllTasks.bind(this)}
+                />
+                <Button
+                  icon={<LockIcon />}
+                  text
+                  iconOnly
+                  onClick={this.loginMods.bind(this)}
                 />
               </li>
               {
