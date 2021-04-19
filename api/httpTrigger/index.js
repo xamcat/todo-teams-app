@@ -64,20 +64,20 @@ module.exports = async function (context, req, config) {
     return res;
   }
 
-  // Create a SQL connection to access data.
-  try {
-    const conn = await client.getSqlConnection();
-    // Please add your code here.
-    conn.close();
-    res.body['SQLMessage'] = 'Successfully get SQL connection.';
-  } catch (e) {
-    context.log.error(e);
-    res.status = 500;
-    res.body = {
-      error: 'Fail to get SQL connection.'
-    };
-    return res;
-  }
+  // // Create a SQL connection to access data.
+  // try {
+  //   const conn = await client.getSqlConnection();
+  //   // Please add your code here.
+  //   conn.close();
+  //   res.body['SQLMessage'] = 'Successfully get SQL connection.';
+  // } catch (e) {
+  //   context.log.error(e);
+  //   res.status = 500;
+  //   res.body = {
+  //     error: 'Fail to get SQL connection.'
+  //   };
+  //   return res;
+  // }
 
   // Create a graph client to access user's Microsoft 365 data after user has consented.
   try {
