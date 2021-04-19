@@ -78,6 +78,30 @@
   flex-grow: 1;
 }
 
+.FlexItemDetailsContentFieldAttachmentsList {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.FlexItemDetailsContentFieldAttachmentsPreview {
+  /* background-color: #e8e8e8; */
+  /* background-color: white; */
+  /* padding: 10px;
+  margin: 10px 10px 10px 10px;
+  font-size: x-large;
+  flex-grow: 1; */
+  /* width: 100px;
+  height: 100px; */
+  padding: 5px;
+}
+
+.FlexItemDetailsContentFieldAttachmentsPreviewImage {
+  width: 100px !important;
+  height: 100px !important;
+  border-radius: 15px;
+}
+
 .FlexItemDetailsToolbar {
   background-color: #e0e0e0;
   padding: 10px;

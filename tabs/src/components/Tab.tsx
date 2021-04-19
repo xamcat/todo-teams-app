@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { MODS } from "mods-client";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { Text, Input, Button, Checkbox, Datepicker, AddIcon, LockIcon, ParticipantAddIcon, TrashCanIcon, SendIcon, RaiseHandIcon, ArrowRightIcon, FilesImageIcon, NotesIcon, AttachmentIcon } from '@fluentui/react-northstar';
+import { Text, Input, Button, Image, Checkbox, Datepicker, AddIcon, LockIcon, ParticipantAddIcon, TrashCanIcon, SendIcon, RaiseHandIcon, ArrowRightIcon, FilesImageIcon, NotesIcon, AttachmentIcon } from '@fluentui/react-northstar';
 import { v4 as uuid } from "uuid";
 import './App.css';
 import './Tab.css';
@@ -45,7 +45,7 @@ class Tab extends React.Component<TabProps, TabState> {
         dueDate: null,
         createdDate: null,
         people: null,
-        attachments: null,
+        attachments: [],
         label: "Add a task"
       },
       toDoItemDetails: null,
@@ -126,9 +126,9 @@ class Tab extends React.Component<TabProps, TabState> {
       this.setState({ ...restoredState });
     } else {
       const defaultState = [
-        { id: uuid(), name: "Task 1", isCompleted: false, notes: "Notes for task 1", dueDate: Date.now(), createdDate: Date.now(), people: null, attachments: null },
-        { id: uuid(), name: "Task 2", isCompleted: false, notes: "Notes for task 2", dueDate: Date.now(), createdDate: Date.now(), people: null, attachments: null },
-        { id: uuid(), name: "Task 3", isCompleted: true, notes: "Notes for task 3", dueDate: Date.now(), createdDate: Date.now(), people: null, attachments: null }
+        { id: uuid(), name: "Task 1", isCompleted: false, notes: "Notes for task 1", dueDate: Date.now(), createdDate: Date.now(), people: null, attachments: [] },
+        { id: uuid(), name: "Task 2", isCompleted: false, notes: "Notes for task 2", dueDate: Date.now(), createdDate: Date.now(), people: null, attachments: [] },
+        { id: uuid(), name: "Task 3", isCompleted: true, notes: "Notes for task 3", dueDate: Date.now(), createdDate: Date.now(), people: null, attachments: [] }
       ]
       this.setState({ toDoItems: defaultState });
     }
@@ -160,9 +160,10 @@ class Tab extends React.Component<TabProps, TabState> {
     microsoftTeams.media.selectMedia(mediaInput, (error: microsoftTeams.SdkError, files: microsoftTeams.media.File[]) => {
       if (error) {
         console.log(error);
+        this.refs.filePicker.click();
       } else {
         console.log(`Do work with images: ${files.length}`);
-      }      
+      }
     });
   }
 
@@ -179,7 +180,7 @@ class Tab extends React.Component<TabProps, TabState> {
       dueDate: null,
       createdDate: Date.now(),
       people: null,
-      attachments: null
+      attachments: []
     });
     this.state.toDoItemNew.name = "";
     this.setState({
@@ -246,6 +247,35 @@ class Tab extends React.Component<TabProps, TabState> {
 
   async handleToDoItemDetailsPeopleBlur(toDoItem: any, event: any) {
     await this.searchUsers(event.target.value);
+  }
+
+  handleToDoItemDetailsAttachmentsChange(toDoItem: any, event: any) {
+    if(event.target.value === null)
+      return;
+
+    console.log(`New attachment: ${event.target.value}`);
+
+    const file = this.refs.filePicker.files[0];
+    console.log(`The file: ${file.name}`);
+
+    var reader = new FileReader();
+    reader.onloadend = function (e: any) {
+      if (this.state.toDoItemDetails.attachments === null) {
+        this.state.toDoItemDetails.attachments = [];
+      }
+      //https://www.pngarts.com/files/2/Upload-Free-PNG-Image.png
+      this.state.toDoItemDetails.attachments.push({
+        name: uuid(),
+        previewSource: file.type === "application/image" ? [reader.result] : "https://www.pngarts.com/files/2/Upload-Free-PNG-Image.png",
+        isUploaded: false,
+      });
+      this.setState({
+        toDoItemDetails: this.state.toDoItemDetails
+      });
+      this.refs.filePicker.value = null;
+      this.saveStateToStorage();
+    }.bind(this);
+    reader.readAsDataURL(file);
   }
 
   handleNewToDoItemChange(toDoItem: any, event: any) {
@@ -416,7 +446,7 @@ class Tab extends React.Component<TabProps, TabState> {
                     value={this.state.toDoItemDetails.people}
                     onChange={this.handleToDoItemDetailsPeopleChange.bind(this, this.state.toDoItemDetails)}
                     onKeyDown={this.handleToDoItemDetailsPeopleKeyPress.bind(this, this.state.toDoItemDetails)}
-                    //onBlur={this.handleToDoItemDetailsPeopleBlur.bind(this, this.state.toDoItemDetails)}
+                    // onBlur={this.handleToDoItemDetailsPeopleBlur.bind(this, this.state.toDoItemDetails)}
                     input={{
                       styles: {
                         background: 'transparent',
@@ -435,9 +465,33 @@ class Tab extends React.Component<TabProps, TabState> {
                   <Button
                     icon={<FilesImageIcon />}
                     text
+                    content="Attachments"
                     iconOnly
                     onClick={this.selectMedia.bind(this)} />
-                  <Text>   Attachments...</Text>
+                  <Input
+                    ref="filePicker"
+                    type="file"
+                    onChange={this.handleToDoItemDetailsAttachmentsChange.bind(this, this.state.toDoItemDetails)}
+                    input={{
+                      styles: {
+                        background: 'transparent',
+                        display: 'none'
+                      }
+                    }} />
+                  <div className="FlexItemDetailsContentFieldAttachmentsList">
+                    {this.state.toDoItemDetails.attachments?.map((attachment: any, index: any) => {
+                      return (
+                        <div className="FlexItemDetailsContentFieldAttachmentsPreview" key={index}>
+                          <Image
+                            className="FlexItemDetailsContentFieldAttachmentsPreviewImage"
+                            
+                            src={attachment.previewSource}
+                          />
+                        </div>
+                      )
+                    })}
+                  </div>
+
                 </div>
               </div>
               <div className="FlexItemDetailsToolbar">
