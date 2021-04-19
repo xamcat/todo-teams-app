@@ -120,9 +120,12 @@ class Tab extends React.Component<TabProps, TabState> {
   }
 
   loadStateFromStorage() {
-    var localState = localStorage.getItem("ToDoItemsState");
+    const localState = localStorage.getItem("ToDoItemsState");
     if (localState) {
-      var restoredState = JSON.parse(localState);
+      const restoredState = JSON.parse(localState);
+      if (restoredState.toDoItemDetails !== null) {
+        restoredState.toDoItemDetails = restoredState.toDoItems.find((i: any) => i.id === restoredState.toDoItemDetails.id);
+      }
       this.setState({ ...restoredState });
     } else {
       const defaultState = [
@@ -250,7 +253,7 @@ class Tab extends React.Component<TabProps, TabState> {
   }
 
   handleToDoItemDetailsAttachmentsChange(toDoItem: any, event: any) {
-    if(event.target.value === null)
+    if (event.target.value === null)
       return;
 
     console.log(`New attachment: ${event.target.value}`);
@@ -484,7 +487,7 @@ class Tab extends React.Component<TabProps, TabState> {
                         <div className="FlexItemDetailsContentFieldAttachmentsPreview" key={index}>
                           <Image
                             className="FlexItemDetailsContentFieldAttachmentsPreviewImage"
-                            
+
                             src={attachment.previewSource}
                           />
                         </div>
