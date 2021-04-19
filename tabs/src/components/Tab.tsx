@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { MODS } from "mods-client";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { Text, Input, Button, Image, Checkbox, Datepicker, AddIcon, LockIcon, ParticipantAddIcon, TrashCanIcon, SendIcon, RaiseHandIcon, ArrowRightIcon, FilesImageIcon, NotesIcon, AttachmentIcon } from '@fluentui/react-northstar';
+import { Text, Input, Button, Image, Checkbox, Datepicker, AddIcon, LockIcon, ParticipantAddIcon, TrashCanIcon, SendIcon, RaiseHandIcon, ArrowRightIcon, FilesImageIcon, NotesIcon, AttachmentIcon, LightningIcon } from '@fluentui/react-northstar';
 import { v4 as uuid } from "uuid";
 import './App.css';
 import './Tab.css';
@@ -170,6 +170,17 @@ class Tab extends React.Component<TabProps, TabState> {
     });
   }
 
+  async callAzureFunction() {
+    try {
+      var messageJson = await MODS.callFunction("httpTrigger", "post", "hello");
+      var message = JSON.stringify(messageJson, undefined, 2);
+      alert(`Azure function call is completed: ${message}`);
+    }
+    catch (err) {
+      console.error(err);
+    }
+  }
+
   addNewTask(toDoItem: any) {
     if (toDoItem.name === "") {
       return;
@@ -269,7 +280,7 @@ class Tab extends React.Component<TabProps, TabState> {
       //https://www.pngarts.com/files/2/Upload-Free-PNG-Image.png
       this.state.toDoItemDetails.attachments.push({
         name: uuid(),
-        previewSource: file.type === "application/image" ? [reader.result] : "https://www.pngarts.com/files/2/Upload-Free-PNG-Image.png",
+        previewSource: file.type === "image/png" ? [reader.result] : "https://www.pngarts.com/files/2/Upload-Free-PNG-Image.png",
         isUploaded: false,
       });
       this.setState({
@@ -370,6 +381,12 @@ class Tab extends React.Component<TabProps, TabState> {
                   text
                   iconOnly
                   onClick={this.loginMods.bind(this)}
+                />
+                <Button
+                  icon={<LightningIcon />}
+                  text
+                  iconOnly
+                  onClick={this.callAzureFunction.bind(this)}
                 />
               </li>
               {
