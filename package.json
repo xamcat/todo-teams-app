@@ -1,0 +1,14 @@
+{
+    "name": "ToDoTeamsApp",
+    "version": "0.0.1",
+    "description": "",
+    "author": "",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "@fluentui/react-northstar": "^0.56.0",
+        "uuid": "^8.3.2"
+    }
+}

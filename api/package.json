@@ -1,16 +1,20 @@
 {
-    "name": "function-component",
-    "version": "1.0.0",
-    "description": "",
-    "scripts": {
-        "start": "node ./scripts/start.js func start",
-        "test": "echo \"No tests yet...\""
-    },
-    "dependencies": {
-        "mods-server": "github:OfficeDev/mods-server-sdk-private-preview"
-    },
-    "devDependencies": {},
-    "msteams": {
-        "teamsAppId": "537e8a34-8656-425c-8b65-2eed21dcc505"
-    }
+  "name": "teamsfx-template-api",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "prestart": "npm run build",
+    "start": "npx func start"
+  },
+  "dependencies": {
+    "@azure/functions": "^1.2.2",
+    "@microsoft/microsoft-graph-client": "^2.2.1",
+    "@microsoft/teamsfx": "^0.1.0",
+    "isomorphic-fetch": "^3.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^3.3.3",
+    "azure-functions-core-tools": "^3.0.0"
+  }
 }

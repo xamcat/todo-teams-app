@@ -1,2 +1,4 @@
-.config/.env
-.vscode/settings.json
+node_modules
+/.fx/*.env
+/.fx/*.userdata
+.DS_Store

@@ -1,8 +1,9 @@
-import React, { useRef } from 'react';
-import { MODS } from "mods-client";
+import React from "react";
+import { TeamsUserCredential, createMicrosoftGraphClient, getResourceConfiguration, ResourceType } from "@microsoft/teamsfx";
 import * as microsoftTeams from "@microsoft/teams-js";
-import { Text, Input, Button, Image, Checkbox, Datepicker, AddIcon, LockIcon, ParticipantAddIcon, TrashCanIcon, SendIcon, RaiseHandIcon, ArrowRightIcon, FilesImageIcon, NotesIcon, AttachmentIcon, LightningIcon } from '@fluentui/react-northstar';
+import { Text, Input, Button, Image, Checkbox, Datepicker, AddIcon, LockIcon, ParticipantAddIcon, TrashCanIcon, SendIcon, RaiseHandIcon, ArrowRightIcon, FilesImageIcon, NotesIcon, LightningIcon } from '@fluentui/react-northstar';
 import { v4 as uuid } from "uuid";
+import * as axios from "axios";
 import './App.css';
 import './Tab.css';
 
@@ -19,7 +20,9 @@ const styles = {
   }
 }
 
+const localStorageKey = "ToDoItemsState.v1.0.4";
 const graphApiScopes = ['User.Read', 'User.ReadBasic.All'];
+const azureFunctionName = process.env.REACT_APP_FUNC_NAME || "myFunc";
 
 interface TabProps {
 }
@@ -33,8 +36,11 @@ interface TabState {
 
 class Tab extends React.Component<TabProps, TabState> {
 
+  private filePickerRef: any;
+
   constructor(props: TabProps) {
     super(props)
+    this.filePickerRef = React.createRef();
     this.state = {
       userInfo: {},
       toDoItemNew: {
@@ -55,44 +61,37 @@ class Tab extends React.Component<TabProps, TabState> {
 
   async componentDidMount() {
     this.loadStateFromStorage();
-    await this.initMODS();
+    await this.initTeamsFx();
     microsoftTeams.initialize();
   }
 
-  async initMODS() {
-    var modsEndpoint = process.env.REACT_APP_MODS_ENDPOINT;
-    var startLoginPageUrl = process.env.REACT_APP_START_LOGIN_PAGE_URL;
-    var functionEndpoint = process.env.REACT_APP_FUNC_ENDPOINT;
-    await MODS.init(modsEndpoint!, startLoginPageUrl!, functionEndpoint);
-    var userInfo = MODS.getUserInfo();
+  async initTeamsFx() {
+    const credential = new TeamsUserCredential();
+    var userInfo = await credential.getUserInfo();
     this.setState({
       userInfo: userInfo
     });
   }
 
-  async loginMods() {
-    await MODS.popupLoginPage(graphApiScopes);
-    //await this.callModsGraphSilent();
+  async authorizeTeamsFx() {
+    const credential = new TeamsUserCredential();
+    await credential.login(graphApiScopes);
+  }
+
+  async createGraphClient() {
+    const credential = new TeamsUserCredential();
+    const graph = createMicrosoftGraphClient(credential, graphApiScopes);
+    return graph;
   }
 
   async searchUsers(filter: string) {
     if (!filter || filter === '')
       return;
 
-    const graphClient = await MODS.getMicrosoftGraphClient(graphApiScopes);
-    // var profile = await graphClient.api("/me").get();
-    // this.setState({
-    //   profile: profile,
-    // })
-
-    // var photoBlob = await graphClient.api("/me/photo/$value").get();
-    // this.setState({
-    //   profilePhoto: URL.createObjectURL(photoBlob),
-    // });
-
     try {
+      const graph = await this.createGraphClient();
       var graphQuery = `/users?$filter=startswith(displayName,'${filter}')`;
-      var searchUsers = await graphClient.api(graphQuery).get();
+      var searchUsers = await graph.api(graphQuery).get();
       if (searchUsers && searchUsers.value && searchUsers.value.length > 0) {
         const bestMatch = searchUsers.value[0];
         console.log(`Found ${searchUsers.value.length} users, assigning ${bestMatch.userPrincipalName}...`);
@@ -102,25 +101,28 @@ class Tab extends React.Component<TabProps, TabState> {
     }
     catch (err) {
       console.log(err);
-      if (err.message.indexOf("Access token is expired or invalid") >= 0) {
-        // TODO: doesn't work: FailedToOpenWindow
-        await this.loginMods();
-      }
+      await this.authorizeTeamsFx();
     }
   }
 
   async searchManager() {
-    const graphClient = await MODS.getMicrosoftGraphClient(graphApiScopes);
-    var bestMatch = await graphClient.api(`/me/manager`).get();
-    if (bestMatch) {
-      console.log(`Found manager, assigning ${bestMatch.userPrincipalName}...`);
-      this.state.toDoItemDetails.people = bestMatch.userPrincipalName;
-      this.setState({ toDoItemDetails: this.state.toDoItemDetails });
+    try {
+      const graph = await this.createGraphClient();
+      var bestMatch = await graph.api(`/me/manager`).get();
+      if (bestMatch) {
+        console.log(`Found manager, assigning ${bestMatch.userPrincipalName}...`);
+        this.state.toDoItemDetails.people = bestMatch.userPrincipalName;
+        this.setState({ toDoItemDetails: this.state.toDoItemDetails });
+      }
+    }
+    catch (err) {
+      console.log(err);
+      await this.authorizeTeamsFx();
     }
   }
 
   loadStateFromStorage() {
-    const localState = localStorage.getItem("ToDoItemsState");
+    const localState = localStorage.getItem(localStorageKey);
     if (localState) {
       const restoredState = JSON.parse(localState);
       if (restoredState.toDoItemDetails !== null) {
@@ -129,17 +131,17 @@ class Tab extends React.Component<TabProps, TabState> {
       this.setState({ ...restoredState });
     } else {
       const defaultState = [
-        { id: uuid(), name: "Task 1", isCompleted: false, notes: "Notes for task 1", dueDate: Date.now(), createdDate: Date.now(), people: null, attachments: [] },
-        { id: uuid(), name: "Task 2", isCompleted: false, notes: "Notes for task 2", dueDate: Date.now(), createdDate: Date.now(), people: null, attachments: [] },
-        { id: uuid(), name: "Task 3", isCompleted: true, notes: "Notes for task 3", dueDate: Date.now(), createdDate: Date.now(), people: null, attachments: [] }
+        { id: uuid(), name: "Task 1", isCompleted: false, notes: "Notes for task 1", dueDate: null, createdDate: Date.now(), people: null, attachments: [] },
+        { id: uuid(), name: "Task 2", isCompleted: false, notes: "Notes for task 2", dueDate: null, createdDate: Date.now(), people: null, attachments: [] },
+        { id: uuid(), name: "Task 3", isCompleted: true, notes: "Notes for task 3", dueDate: null, createdDate: Date.now(), people: null, attachments: [] }
       ]
-      this.setState({ toDoItems: defaultState });
+      this.setState({ toDoItems: defaultState }, () => this.saveStateToStorage());
     }
   }
 
   saveStateToStorage() {
     var localState = JSON.stringify(this.state);
-    localStorage.setItem("ToDoItemsState", localState);
+    localStorage.setItem(localStorageKey, localState);
   }
 
   selectMedia() {
@@ -163,7 +165,7 @@ class Tab extends React.Component<TabProps, TabState> {
     microsoftTeams.media.selectMedia(mediaInput, (error: microsoftTeams.SdkError, files: microsoftTeams.media.File[]) => {
       if (error) {
         console.log(error);
-        this.refs.filePicker.click();
+        this.filePickerRef.current.click();
       } else {
         console.log(`Do work with images: ${files.length}`);
       }
@@ -172,12 +174,20 @@ class Tab extends React.Component<TabProps, TabState> {
 
   async callAzureFunction() {
     try {
-      var messageJson = await MODS.callFunction("httpTrigger", "post", "hello");
-      var message = JSON.stringify(messageJson, undefined, 2);
-      alert(`Azure function call is completed: ${message}`);
-    }
-    catch (err) {
-      console.error(err);
+      const credential = new TeamsUserCredential();
+      const accessToken = await credential.getToken("");
+      const apiConfig = getResourceConfiguration(ResourceType.API);
+      const response = await axios.default.get(apiConfig.endpoint + "/api/" + azureFunctionName, {
+        headers: {
+          authorization: "Bearer " + accessToken?.token || "",
+        },
+      });
+
+      console.log(response);
+      window.alert(`Response from the Azure Function [${azureFunctionName}]:\n${response?.data?.userInfoMessage}`);
+    } catch (err) {
+      console.log(err);
+      await this.authorizeTeamsFx();
     }
   }
 
@@ -196,17 +206,18 @@ class Tab extends React.Component<TabProps, TabState> {
       people: null,
       attachments: []
     });
-    this.state.toDoItemNew.name = "";
-    this.setState({
-      toDoItemNew: this.state.toDoItemNew
-    });
-    this.saveStateToStorage();
+    toDoItem.name = "";
+    this.setState({ toDoItemNew: this.state.toDoItemNew }, () => this.saveStateToStorage());
   }
 
   clearAllTasks() {
-    this.state.toDoItems = [];
-    this.state.toDoItemDetails = null;
-    this.setState({ ...this.state });
+    if (!window.confirm("Do you want to delete all tasks?"))
+      return;
+
+    this.setState({
+      toDoItems: [],
+      toDoItemDetails: null,
+    }, () => this.saveStateToStorage());
   }
 
   removeToDoTask(toDoItem: any) {
@@ -214,43 +225,41 @@ class Tab extends React.Component<TabProps, TabState> {
       return;
     }
 
+    if (this.state.toDoItemDetails === toDoItem) {
+      this.setState({ toDoItemDetails: null }, () => this.saveStateToStorage());
+    }
+
     const index = this.state.toDoItems.indexOf(toDoItem);
     if (index > -1) {
       this.state.toDoItems.splice(index, 1);
+      this.saveStateToStorage();
     }
-
-    if (this.state.toDoItemDetails === toDoItem) {
-      this.state.toDoItemDetails = null;
-    }
-
-    this.setState({ ...this.state });
-    this.saveStateToStorage();
   }
 
   handleToDoItemDetailsNameChange(toDoItem: any, event: any) {
-    this.state.toDoItemDetails.name = event.target.value;
+    toDoItem.name = event.target.value;
     this.setState({ toDoItemDetails: this.state.toDoItemDetails });
   }
 
   handleToDoItemDetailsNotesChange(toDoItem: any, event: any) {
-    this.state.toDoItemDetails.notes = event.target.value;
+    toDoItem.notes = event.target.value;
     this.setState({ toDoItemDetails: this.state.toDoItemDetails });
   }
 
-  handleToDoItemDetailsDateChange(toDoItem: any, event: any) {
-    this.state.toDoItemDetails.dueDate = event.target.value;
+  handleToDoItemDetailsDateChange(toDoItem: any, event: any, args: any) {
+    toDoItem.dueDate = args.itemProps.value.originalDate.getTime();
     this.setState({ toDoItemDetails: this.state.toDoItemDetails });
   }
 
   async handleToDoItemDetailsPeopleChange(toDoItem: any, event: any) {
-    this.state.toDoItemDetails.people = event.target.value;
+    toDoItem.people = event.target.value;
     this.setState({ toDoItemDetails: this.state.toDoItemDetails });
   }
 
   async handleToDoItemDetailsPeopleKeyPress(toDoItem: any, event: any) {
     switch (event.key) {
       case "Escape":
-        this.state.toDoItemDetails.people = "";
+        toDoItem.people = "";
         this.setState({ toDoItemDetails: this.state.toDoItemDetails });
         break;
       case "Enter":
@@ -269,38 +278,33 @@ class Tab extends React.Component<TabProps, TabState> {
 
     console.log(`New attachment: ${event.target.value}`);
 
-    const file = this.refs.filePicker.files[0];
+    const file = this.filePickerRef.current.files[0];
     console.log(`The file: ${file.name}`);
 
     var reader = new FileReader();
-    reader.onloadend = function (e: any) {
-      if (this.state.toDoItemDetails.attachments === null) {
-        this.state.toDoItemDetails.attachments = [];
-      }
-      //https://www.pngarts.com/files/2/Upload-Free-PNG-Image.png
+    reader.onloadend = () => {
+      const defaultImage = "https://www.pngarts.com/files/2/Upload-Free-PNG-Image.png";
       this.state.toDoItemDetails.attachments.push({
         name: uuid(),
-        previewSource: file.type === "image/png" ? [reader.result] : "https://www.pngarts.com/files/2/Upload-Free-PNG-Image.png",
+        previewSource: (file.type === "image/png" || file.type === "image/jpeg") ? [reader.result] : defaultImage,
         isUploaded: false,
       });
-      this.setState({
-        toDoItemDetails: this.state.toDoItemDetails
-      });
-      this.refs.filePicker.value = null;
-      this.saveStateToStorage();
-    }.bind(this);
+      this.setState({ toDoItemDetails: this.state.toDoItemDetails }, () => this.saveStateToStorage());
+      this.filePickerRef.current.value = null;
+    };
+
     reader.readAsDataURL(file);
   }
 
   handleNewToDoItemChange(toDoItem: any, event: any) {
-    this.state.toDoItemNew.name = event.target.value;
+    toDoItem.name = event.target.value;
     this.setState({ toDoItemNew: this.state.toDoItemNew });
   }
 
   handleNewToDoItemKeyPress(toDoItem: any, event: any) {
     switch (event.key) {
       case "Escape":
-        this.state.toDoItemNew.name = "";
+        toDoItem.name = "";
         this.setState({ toDoItemNew: this.state.toDoItemNew });
         break;
       case "Enter":
@@ -315,84 +319,71 @@ class Tab extends React.Component<TabProps, TabState> {
 
   handleToDoItemCompletionChange(toDoItem: any, event: any) {
     toDoItem.isCompleted = !toDoItem.isCompleted;
-    this.setState({ toDoItem: toDoItem });
-    this.saveStateToStorage();
+    this.setState({ ...this.state }, () => this.saveStateToStorage());
   }
 
   handleToDoItemSelected(toDoItem: any, event: any) {
-    if (!toDoItem) {
-      return;
-    }
-
-    this.setState({
-      isDoItemDetailsOpened: (toDoItem && toDoItem !== this.state.toDoItemDetails) ? true : false,
-      toDoItemDetails: toDoItem,
-    });
-  }
-
-  handleToDoItemDeselected(saveState: boolean) {
-    this.setState({ toDoItemDetails: null });
-
-    if (saveState === true) {
-      this.saveStateToStorage();
-    }
+    this.setState({ toDoItemDetails: toDoItem }, () => this.saveStateToStorage());
   }
 
   render() {
     return (
       <div className="Tab">
         <div className="Title">ToDo App</div>
-        <div className="Subtitle">Hello, {this.state.userInfo.userName}</div>
+        <div className="Subtitle">Hello, {this.state.userInfo.displayName}</div>
+        <div className="AddNewTask">
+          <Input
+            placeholder={this.state.toDoItemNew.label}
+            clearable
+            icon={<AddIcon />}
+            iconPosition="start"
+            value={this.state.toDoItemNew.name}
+            onKeyDown={this.handleNewToDoItemKeyPress.bind(this, this.state.toDoItemNew)}
+            onChange={this.handleNewToDoItemChange.bind(this, this.state.toDoItemNew)}
+            onBlur={this.handleNewToDoItemBlur.bind(this, this.state.toDoItemNew)}
+            styles={styles.ToDoListItemNew}
+            input={{
+              styles: {
+                background: 'transparent',
+              }
+            }}>
+          </Input>
+          <Button
+            icon={<SendIcon />}
+            text
+            iconOnly
+            title="Add new task"
+            onClick={this.addNewTask.bind(this, this.state.toDoItemNew)}
+          />
+          <Button
+            icon={<TrashCanIcon />}
+            text
+            iconOnly
+            title="Delete all tasks"
+            onClick={this.clearAllTasks.bind(this)}
+          />
+          <Button
+            icon={<LockIcon />}
+            text
+            iconOnly
+            title="Authorize TeamsFx"
+            onClick={this.authorizeTeamsFx.bind(this)}
+          />
+          <Button
+            icon={<LightningIcon />}
+            text
+            iconOnly
+            title="Call Azure Function"
+            onClick={this.callAzureFunction.bind(this)}
+          />
+        </div>
         <div className="FlexContainer">
           <div className="FlexItemMain">
             <div className="ToDoList">
-              <li className="ToDoListItem" key="-1">
-                <Input
-                  placeholder={this.state.toDoItemNew.label}
-                  clearable
-                  icon={<AddIcon />}
-                  iconPosition="start"
-                  value={this.state.toDoItemNew.name}
-                  onKeyDown={this.handleNewToDoItemKeyPress.bind(this, this.state.toDoItemNew)}
-                  onChange={this.handleNewToDoItemChange.bind(this, this.state.toDoItemNew)}
-                  onBlur={this.handleNewToDoItemBlur.bind(this, this.state.toDoItemNew)}
-                  styles={styles.ToDoListItemNew}
-                  input={{
-                    styles: {
-                      // color: 'cornflowerblue',
-                      background: 'transparent',
-                    }
-                  }}>
-                </Input>
-                <Button
-                  icon={<SendIcon />}
-                  text
-                  iconOnly
-                  onClick={this.addNewTask.bind(this, this.state.toDoItemNew)}
-                />
-                <Button
-                  icon={<TrashCanIcon />}
-                  text
-                  iconOnly
-                  onClick={this.clearAllTasks.bind(this)}
-                />
-                <Button
-                  icon={<LockIcon />}
-                  text
-                  iconOnly
-                  onClick={this.loginMods.bind(this)}
-                />
-                <Button
-                  icon={<LightningIcon />}
-                  text
-                  iconOnly
-                  onClick={this.callAzureFunction.bind(this)}
-                />
-              </li>
               {
                 this.state.toDoItems.map((toDoItem: any, index: any) => {
                   return (
-                    <li className="ToDoListItem" key={index} onClick={this.handleToDoItemSelected.bind(this, toDoItem)}>
+                    <li className={toDoItem.id !== this.state.toDoItemDetails?.id ? "ToDoListItem" : "ToDoListItemSelected"} key={index} onClick={this.handleToDoItemSelected.bind(this, toDoItem)}>
                       <Checkbox
                         className="ToDoListItemCheckbox"
                         checked={toDoItem.isCompleted}
@@ -443,12 +434,10 @@ class Tab extends React.Component<TabProps, TabState> {
                     }} />
                 </div>
                 <div className="FlexItemDetailsContentField">
-                  {/* <CalendarIcon /> */}
                   <Datepicker
                     allowManualInput={false}
                     daysToSelectInDayView={1}
-                    //defaultSelectedDate={this.state.toDoItemDetails.dueDate} // TODO: defaultSelectedDate and value are not recognized
-                    value={new Date(this.state.toDoItemDetails.dueDate)}
+                    selectedDate={(this.state.toDoItemDetails.dueDate ? new Date(this.state.toDoItemDetails.dueDate) : new Date())}
                     onDateChange={this.handleToDoItemDetailsDateChange.bind(this, this.state.toDoItemDetails)}
                     input={{
                       styles: {
@@ -466,11 +455,10 @@ class Tab extends React.Component<TabProps, TabState> {
                     value={this.state.toDoItemDetails.people}
                     onChange={this.handleToDoItemDetailsPeopleChange.bind(this, this.state.toDoItemDetails)}
                     onKeyDown={this.handleToDoItemDetailsPeopleKeyPress.bind(this, this.state.toDoItemDetails)}
-                    // onBlur={this.handleToDoItemDetailsPeopleBlur.bind(this, this.state.toDoItemDetails)}
                     input={{
                       styles: {
                         background: 'transparent',
-                        width: 350
+                        width: 315
                       }
                     }}>
                   </Input>
@@ -478,6 +466,7 @@ class Tab extends React.Component<TabProps, TabState> {
                     icon={<RaiseHandIcon />}
                     text
                     iconOnly
+                    title="Find my manager!"
                     onClick={this.searchManager.bind(this)}
                   />
                 </div>
@@ -489,7 +478,7 @@ class Tab extends React.Component<TabProps, TabState> {
                     iconOnly
                     onClick={this.selectMedia.bind(this)} />
                   <Input
-                    ref="filePicker"
+                    ref={this.filePickerRef}
                     type="file"
                     onChange={this.handleToDoItemDetailsAttachmentsChange.bind(this, this.state.toDoItemDetails)}
                     input={{
@@ -504,7 +493,6 @@ class Tab extends React.Component<TabProps, TabState> {
                         <div className="FlexItemDetailsContentFieldAttachmentsPreview" key={index}>
                           <Image
                             className="FlexItemDetailsContentFieldAttachmentsPreviewImage"
-
                             src={attachment.previewSource}
                           />
                         </div>
@@ -520,14 +508,14 @@ class Tab extends React.Component<TabProps, TabState> {
                     icon={<ArrowRightIcon />}
                     text
                     iconOnly
-                    onClick={this.handleToDoItemDeselected.bind(this, true)} />
+                    onClick={this.handleToDoItemSelected.bind(this, null)} />
                 </div>
                 <div className="FlexItemDetailsToolbarMiddle">
                   <div>
                     Created {new Date(this.state.toDoItemDetails.createdDate).toLocaleString()}
                   </div>
                   <div className="ToDoListItemUuid">
-                    {this.state.toDoItemDetails.id}Î
+                    {this.state.toDoItemDetails.id}
                   </div>
                 </div>
                 <div className="FlexItemDetailsToolbarRight">

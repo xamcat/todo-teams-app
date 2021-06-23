@@ -9,7 +9,7 @@
         "get",
         "post"
       ],
-      "route": "httpTrigger"
+      "route": "getUserProfile"
     },
     {
       "type": "http",
@@ -18,8 +18,9 @@
     },
     {
       "direction": "in",
-      "name": "config",
-      "type": "MODS"
+      "name": "teamsfxContext",
+      "type": "TeamsFx"
     }
-  ]
+  ],
+  "scriptFile": "../dist/getUserProfile/index.js"
 }

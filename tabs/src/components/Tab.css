@@ -1,125 +1,139 @@
 .Tab {
-  padding: 10px 20px 10px 20px;
-  height: 100%;
-  overflow: scroll;
+    padding: 20px;
+    height: 100%;
+    overflow: scroll;
 }
 
 .Title {
-  /* color: white; */
-  font-size: x-large;
+    padding: 0px 5px 0px 5px;
+    font-size: x-large;
 }
 
 .Subtitle {
-  color: cornflowerblue;
-  font-size: medium;
+    padding: 0px 5px 0px 5px;
+    color: cornflowerblue;
+    font-size: medium;
+}
+
+.AddNewTask {
+    font-size: large;
+    list-style-type: none;
+    padding: 20px 0px 10px 0px;
+    cursor: pointer;
 }
 
 .ToDoList {}
 
 .ToDoListItem {
-  font-size: large;
-  list-style-type: none;
-  padding: 5px 0px 5px 0px;
-  cursor: pointer;
+    font-size: large;
+    list-style-type: none;
+    padding: 5px 0px 5px 0px;
+    cursor: pointer;
+}
+
+.ToDoListItemSelected {
+    font-size: large;
+    list-style-type: none;
+    font-weight: bold;
+    background-color: #e0e0ea;
+    padding: 5px 0px 5px 0px;
+    cursor: pointer;
 }
 
 .ToDoListItemCheckbox {
-  align-content: center;
+    align-content: center;
+    margin-bottom: 3px;
 }
 
 .ToDoListItemUuid {
-  align-content: center;
-  color: darkgray;
-  font-size: x-small;
+    align-content: center;
+    color: darkgray;
+    font-size: x-small;
 }
 
 .FlexContainer {
-  display: flex;
-  padding: 20px 0px 20px 0px;
-  height: 90%;
+    display: flex;
+    height: 83%;
 }
 
 .FlexItemMain {
-  flex-grow: 1;
-  /* background-color: grey; */
+    flex-grow: 1;
 }
 
 .FlexItemDetails {
-  width: 400px;
-  height: 100%;
-  background-color: #f0f0f0;
-  display: flex;
-  flex-direction: column;
+    width: 400px;
+    height: 100%;
+    background-color: #e0e0ea;
+    display: flex;
+    flex-direction: column;
 }
 
 .FlexItemDetailsContent {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .FlexItemDetailsContentField {
-  background-color: #e8e8e8;
-  /* background-color: white; */
-  padding: 10px;
-  margin: 10px 10px 0px 10px;
-  font-size: x-large;
-  display: flex;
-  flex-direction: row;
-  align-content: center;
+    background-color: #e8e8e8;
+    padding: 10px;
+    margin: 10px 10px 0px 10px;
+    font-size: x-large;
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
 }
 
 .FlexItemDetailsContentFieldAttachments {
-  background-color: #e8e8e8;
-  /* background-color: white; */
-  padding: 10px;
-  margin: 10px 10px 10px 10px;
-  font-size: x-large;
-  flex-grow: 1;
+    background-color: #e8e8e8;
+    padding: 10px;
+    margin: 10px 10px 10px 10px;
+    font-size: x-large;
+    flex-grow: 1;
 }
 
 .FlexItemDetailsContentFieldAttachmentsList {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
 }
 
 .FlexItemDetailsContentFieldAttachmentsPreview {
-  /* background-color: #e8e8e8; */
-  /* background-color: white; */
-  /* padding: 10px;
-  margin: 10px 10px 10px 10px;
-  font-size: x-large;
-  flex-grow: 1; */
-  /* width: 100px;
-  height: 100px; */
-  padding: 5px;
+    /* background-color: #e8e8e8; */
+    /* background-color: white; */
+    /* padding: 10px;
+    margin: 10px 10px 10px 10px;
+    font-size: x-large;
+    flex-grow: 1; */
+    /* width: 100px;
+    height: 100px; */
+    padding: 5px;
 }
 
 .FlexItemDetailsContentFieldAttachmentsPreviewImage {
-  width: 100px !important;
-  height: 100px !important;
-  border-radius: 15px;
+    width: 100px !important;
+    height: 100px !important;
+    border-radius: 15px;
 }
 
 .FlexItemDetailsToolbar {
-  background-color: #e0e0e0;
-  padding: 10px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
+    background-color: #e0e0ea;
+    padding: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }
 
-.FlexItemDetailsToolbarLeft {
-}
+.FlexItemDetailsToolbarLeft {}
 
 .FlexItemDetailsToolbarMiddle {
-  padding: 5px;
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  text-align: center;
+    padding: 5px;
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
 }
 
 .FlexItemDetailsToolbarRight {}

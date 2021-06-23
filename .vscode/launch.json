@@ -1,34 +1,94 @@
 {
-    "version": "1.0.0",
+    "version": "0.2.0",
     "configurations": [
         {
-            "name": "Local Debug Tab App (Teams Web Client)",
+            "name": "Launch Remote (Edge)",
             "type": "pwa-msedge",
             "request": "launch",
-            "url": "https://teams.microsoft.com/_#/l/app/d3fcbad3-e8d3-4f47-aae4-2b99966bcc57?installAppPackage=true",
-            "webRoot": "${workspaceFolder}",
-            "preLaunchTask": "Start tab app and auth server",
-            "postDebugTask": "Terminate tab app and auth server"
+            "url": "https://teams.microsoft.com/l/app/${teamsAppId}?installAppPackage=true&webjoin=true&${account-hint}",
+            "presentation": {
+                "group": "remote",
+                "order": 2
+            }
         },
         {
-            "name": "Debug (Teams Web Client)",
+            "name": "Launch Remote (Chrome)",
+            "type": "pwa-chrome",
+            "request": "launch",
+            "url": "https://teams.microsoft.com/l/app/${teamsAppId}?installAppPackage=true&webjoin=true&${account-hint}",
+            "presentation": {
+                "group": "remote",
+                "order": 1
+            }
+        },
+        {
+            "name": "Start and Attach to Frontend (Edge)",
             "type": "pwa-msedge",
             "request": "launch",
-            "url": "https://teams.microsoft.com/_#/l/app/537e8a34-8656-425c-8b65-2eed21dcc505?installAppPackage=true",
-            "webRoot": "${workspaceFolder}"
+            "url": "https://teams.microsoft.com/l/app/${localTeamsAppId}?installAppPackage=true&webjoin=true&${account-hint}",
+            "preLaunchTask": "Start Frontend",
+            "cascadeTerminateToConfigurations": [
+                "Start and Attach to Backend"
+            ],
+            "presentation": {
+                "group": "all",
+                "hidden": true
+            }
         },
+        {
+            "name": "Start and Attach to Frontend (Chrome)",
+            "type": "pwa-chrome",
+            "request": "launch",
+            "url": "https://teams.microsoft.com/l/app/${localTeamsAppId}?installAppPackage=true&webjoin=true&${account-hint}",
+            "preLaunchTask": "Start Frontend",
+            "cascadeTerminateToConfigurations": [
+                "Start and Attach to Backend"
+            ],
+            "presentation": {
+                "group": "all",
+                "hidden": true
+            }
+        },
+        {
+            "name": "Start and Attach to Backend",
+            "type": "pwa-node",
+            "request": "attach",
+            "port": 9229,
+            "restart": true,
+            "preLaunchTask": "Start Backend",
+            "presentation": {
+                "group": "all",
+                "hidden": true
+            },
+            "internalConsoleOptions": "neverOpen"
+        }
+    ],
+    "compounds": [
         {
             "name": "Debug (Edge)",
-            "type": "pwa-msedge",
-            "request": "launch",
-            "url": "https://localhost:3000/index.html#/tab",
-            "webRoot": "${workspaceFolder}"
+            "configurations": [
+                "Start and Attach to Frontend (Edge)",
+                "Start and Attach to Backend"
+            ],
+            "preLaunchTask": "Pre Debug Check",
+            "presentation": {
+                "group": "all",
+                "order": 2
+            },
+            "stopAll": true
         },
         {
-            "name": "Local Debug Function",
-            "type": "node",
-            "request": "attach",
-            "port": 5858
+            "name": "Debug (Chrome)",
+            "configurations": [
+                "Start and Attach to Frontend (Chrome)",
+                "Start and Attach to Backend"
+            ],
+            "preLaunchTask": "Pre Debug Check",
+            "presentation": {
+                "group": "all",
+                "order": 1
+            },
+            "stopAll": true
         }
     ]
 }
