@@ -11,7 +11,7 @@ This repository contains a simple ToDo app for Microsoft Teams built with the la
 
 ## Demo
 
-TBD
+![Figma Prototype](todo-demo.gif)
 
 ## Figma Design
 
